@@ -1,12 +1,12 @@
 package me.clearedSpore.sporeCore.commands.teleport
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.Default
 import org.bukkit.entity.Player
 
 @CommandAlias("tpaccept")
-class TpaAcceptCommand() : BaseCommand() {
+class TpaAcceptCommand : SporeCommand() {
 
     @Default
     fun onAccept(player: Player) {
@@ -15,7 +15,7 @@ class TpaAcceptCommand() : BaseCommand() {
 }
 
 @CommandAlias("tpdeny")
-class TpaDenyCommand : BaseCommand() {
+class TpaDenyCommand : SporeCommand() {
 
     @Default
     fun onDeny(player: Player) {

@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.moderation
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeCore.extension.PlayerExtension.userFail
 import me.clearedSpore.sporeCore.features.punishment.PunishmentService
@@ -13,7 +13,7 @@ import org.bukkit.entity.Player
 abstract class AbstractPunishCommand(
     private val type: PunishmentType,
     private val requiresTime: Boolean = false
-) : BaseCommand() {
+) : SporeCommand() {
 
     abstract val customPermission: String
 

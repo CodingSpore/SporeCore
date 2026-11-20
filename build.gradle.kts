@@ -1,14 +1,14 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("jvm") version "2.2.20"
+    kotlin("jvm") version "2.3.0"
     id("com.gradleup.shadow") version "9.3.1"
     id("xyz.jpenilla.run-paper") version "2.3.1"
     kotlin("plugin.lombok") version "2.2.20"
 }
 
 group = "me.clearedSpore"
-version = "2.8.3"
+version = "2.8.4"
 
 repositories {
     mavenCentral()
@@ -19,6 +19,8 @@ repositories {
     maven("https://maven.enginehub.org/repo/")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://nexus.scarsz.me/content/groups/public/")
+    maven("https://repo.xenondevs.xyz/releases")
+    maven("https://repo.sporedev.eu/releases")
 }
 
 dependencies {
@@ -37,10 +39,12 @@ dependencies {
         exclude(group = "org.yaml", module = "snakeyaml")
     }
     implementation("com.github.Exlll.ConfigLib:configlib-yaml:v4.6.1")
-    implementation(files("libs/SporeAPI.jar"))
+    implementation("eu.sporedev:sporeapi-acf:11.0.0")
+    implementation("eu.sporedev:sporeapi-paper:11.0.0")
+    implementation("xyz.xenondevs.invui:invui-kotlin:2.5.1")
     compileOnly("org.dizitart:nitrite:4.3.2")
     compileOnly(platform("org.dizitart:nitrite-bom:4.3.2"))
-    compileOnly("org.dizitart:nitrite-mvstore-adapter:4.3.2")
+    compileOnly("org.dizitart:nitrite-mvstore-adapter:4.3.3")
 
 
     compileOnly("org.reflections:reflections:0.10.2")
@@ -79,11 +83,11 @@ tasks {
     }
 }
 
-val targetJavaVersion = 21
+val targetJavaVersion = 25
 kotlin {
     jvmToolchain(targetJavaVersion)
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_21)
+        jvmTarget.set(JvmTarget.JVM_25)
     }
 }
 

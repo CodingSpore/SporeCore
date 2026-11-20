@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.economy
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.red
@@ -13,7 +13,7 @@ import org.bukkit.command.CommandSender
 
 @CommandAlias("ecologs|economylogs")
 @CommandPermission(Perm.ECO_ADMIN)
-class EcoLogsCommand : BaseCommand() {
+class EcoLogsCommand : SporeCommand() {
 
     @Default
     @CommandCompletion("@players")

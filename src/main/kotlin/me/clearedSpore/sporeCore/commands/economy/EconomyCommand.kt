@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.economy
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import co.aikar.commands.bukkit.contexts.OnlinePlayer
 import me.clearedSpore.sporeAPI.util.CC.blue
@@ -19,7 +19,7 @@ import org.bukkit.entity.Player
 
 @CommandAlias("eco|economy|bal|balance")
 @CommandPermission(Perm.ECO)
-class EconomyCommand : BaseCommand() {
+class EconomyCommand : SporeCommand() {
 
     @Default
     @CommandCompletion("@players")

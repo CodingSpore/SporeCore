@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.privatemessages
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Default
@@ -15,7 +15,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 @CommandAlias("socialspy")
-class SocialSpyCommand : BaseCommand() {
+class SocialSpyCommand : SporeCommand() {
 
 
     @Subcommand("command")

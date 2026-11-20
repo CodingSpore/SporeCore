@@ -159,7 +159,7 @@ object ModeService {
             }
 
             if (mode.vanish && SporeCore.instance.coreConfig.joinLeaveMessages.vanish && !user.getSettingOrDefault(VanishOnMMLeaveSetting()) && playerIssued) {
-                VanishService.unVanish(player.uniqueId, true)
+                VanishService.unVanish(player.uniqueId, false)
                 Bukkit.broadcastMessage(
                     SporeCore.instance.coreConfig.joinLeaveMessages.join
                         .translate()

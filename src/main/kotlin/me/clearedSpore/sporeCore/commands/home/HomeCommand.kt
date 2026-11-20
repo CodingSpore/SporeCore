@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.home
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
 import me.clearedSpore.sporeAPI.util.Message.sendSuccessMessage
@@ -15,7 +15,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
 @CommandAlias("home")
-class HomeCommand() : BaseCommand() {
+class HomeCommand() : SporeCommand() {
 
     @Dependency
     lateinit var homeService: HomeService

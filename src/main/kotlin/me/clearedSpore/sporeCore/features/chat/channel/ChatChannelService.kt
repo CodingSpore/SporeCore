@@ -82,6 +82,8 @@ object ChatChannelService {
             Channel(
                 channelConfig.name,
                 channelConfig.id,
+                channelConfig.discordWebhook,
+                channelConfig.discordID,
                 channelConfig.permission,
                 channelConfig.prefix,
                 channelConfig.message,
@@ -96,6 +98,8 @@ object ChatChannelService {
         return Channel(
             name = name,
             id = id,
+            discordWebhook = discordWebhook,
+            discordID = discordID,
             permission = permission,
             prefix = prefix,
             message = message,

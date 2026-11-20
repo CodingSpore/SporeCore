@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.moderation.mode
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import co.aikar.commands.bukkit.contexts.OnlinePlayer
 import me.clearedSpore.sporeAPI.util.CC.blue
@@ -8,6 +8,7 @@ import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
+import me.clearedSpore.sporeAPI.util.log
 import me.clearedSpore.sporeCore.extension.PlayerExtension.userFail
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
 import me.clearedSpore.sporeCore.features.mode.ModeService
@@ -22,7 +23,7 @@ import org.bukkit.entity.Player
 @CommandPermission(Perm.MODE_ALLOW)
 class CustomModeCommand(
     val mode: Mode,
-) : BaseCommand() {
+) : SporeCommand() {
 
     @Default
     fun onModeToggle(sender: CommandSender, @Optional @Name("target") target: OnlinePlayer?) {

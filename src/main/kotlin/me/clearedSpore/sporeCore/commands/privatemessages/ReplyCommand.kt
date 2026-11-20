@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.privatemessages
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Syntax
@@ -26,7 +26,7 @@ import org.bukkit.entity.Player
 
 
 @CommandAlias("reply|r")
-class ReplyCommand : BaseCommand() {
+class ReplyCommand : SporeCommand() {
 
     @Default
     @Syntax("<message>")

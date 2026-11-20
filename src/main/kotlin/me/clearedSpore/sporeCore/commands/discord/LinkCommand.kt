@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.discord
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Default
@@ -16,7 +16,7 @@ import org.bukkit.entity.Player
 
 @CommandAlias("link")
 @CommandPermission(Perm.LINK)
-class LinkCommand : BaseCommand() {
+class LinkCommand : SporeCommand() {
 
     @Default()
     fun onLink(player: Player) {

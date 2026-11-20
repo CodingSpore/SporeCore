@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.home
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
 import me.clearedSpore.sporeAPI.util.Message.sendSuccessMessage
@@ -11,7 +11,7 @@ import me.clearedSpore.sporeCore.user.UserManager
 import org.bukkit.entity.Player
 
 @CommandAlias("delhome|deletehome")
-class DelHomeCommand() : BaseCommand() {
+class DelHomeCommand() : SporeCommand() {
 
     @Dependency
     lateinit var homeService: HomeService

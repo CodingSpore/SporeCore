@@ -165,6 +165,10 @@ object DiscordService : ListenerAdapter() {
         val config = SporeCore.instance.coreConfig.discord
         if (event.author.isBot || !event.isFromGuild) return
         if (config.chatID.isNotEmpty() && event.channel.id != config.chatID) {
+            if (
+                SporeCore.instance.coreConfig.features.channels &&
+                event.channel.id != ChatChannelService.getChannels().first().discordID
+                ) return
             val channel = ChatChannelService.getChannels().first { it.discordID == event.channel.id }
             val link = requireLink(event) ?: return
             val channelMessage = channel.message

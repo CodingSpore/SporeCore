@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeCore.extension.PlayerExtension.userJoinFail
@@ -10,7 +10,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
 @CommandAlias("stat|stats|checkstats")
-class StatsCommand : BaseCommand() {
+class StatsCommand : SporeCommand() {
 
     @Default
     @CommandCompletion("@players")
