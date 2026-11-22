@@ -7,7 +7,6 @@ import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeAPI.util.Webhook
-import me.clearedSpore.sporeAPI.util.log
 import me.clearedSpore.sporeCore.SporeCore
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
 import me.clearedSpore.sporeCore.features.punishment.`object`.PunishmentType

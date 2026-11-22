@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.moderation
 
-import me.clearedSpore.sporeAPI.command.SporeCommand
+import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.task.Tasks
 import me.clearedSpore.sporeAPI.util.CC.blue
@@ -14,7 +14,7 @@ import org.bukkit.command.CommandSender
 
 @CommandAlias("alts")
 @CommandPermission(Perm.ALTS)
-class AltsCommand : SporeCommand() {
+class AltsCommand : BaseCommand() {
 
     @Default
     @Syntax("<player>")

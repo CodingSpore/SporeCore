@@ -1,6 +1,5 @@
 package me.clearedSpore.sporeCore.features.logs
 
-import me.clearedSpore.sporeAPI.task.SporeScheduledTask
 import me.clearedSpore.sporeAPI.task.Tasks
 import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeAPI.util.time.TimeUtil
@@ -24,7 +23,7 @@ import java.util.concurrent.TimeUnit
 object LogsService {
 
     internal val logsCollection get() = DatabaseManager.getLogsCollection()
-    private var cleanupTask: SporeScheduledTask? = null
+    private var cleanupTask: BukkitTask? = null
 
     fun initializeLogs() {
         if (!logsCollection.hasIndex("id")) {

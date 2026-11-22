@@ -1,7 +1,6 @@
 package me.clearedSpore.sporeCore.features.reports
 
 import com.github.benmanes.caffeine.cache.Caffeine
-import me.clearedSpore.sporeAPI.task.SporeScheduledTask
 import me.clearedSpore.sporeAPI.task.Tasks
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Cooldown
@@ -40,7 +39,7 @@ import java.util.concurrent.TimeUnit
 object ReportService {
 
     internal val reportCollection get() = DatabaseManager.getReportCollection()
-    private var cleanupTask: SporeScheduledTask? = null
+    private var cleanupTask: BukkitTask? = null
 
     private val recentReports = Caffeine.newBuilder()
         .expireAfterWrite(10, TimeUnit.MINUTES)

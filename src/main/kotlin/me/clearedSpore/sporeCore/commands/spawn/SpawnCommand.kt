@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.spawn
 
-import me.clearedSpore.sporeAPI.command.SporeCommand
+import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.Default
 import me.clearedSpore.sporeAPI.util.CC.red
@@ -10,7 +10,7 @@ import org.bukkit.entity.Player
 
 
 @CommandAlias("spawn|gotospawn")
-class SpawnCommand : SporeCommand() {
+class SpawnCommand : BaseCommand() {
 
 
     @Default

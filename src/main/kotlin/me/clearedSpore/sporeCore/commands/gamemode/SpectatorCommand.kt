@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.gamemode
 
-import me.clearedSpore.sporeAPI.command.SporeCommand
+import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.red
@@ -8,8 +8,7 @@ import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.CC.white
 import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeCore.acf.targets.`object`.TargetPlayers
-import me.clearedSpore.sporeAPI.annotation.RegisterCommand
-import me.clearedSpore.sporeAPI.util.log
+import me.clearedSpore.sporeCore.annotations.SporeCoreCommand
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.GameMode
@@ -18,8 +17,8 @@ import org.bukkit.entity.Player
 
 @CommandAlias("spectator|gmsp")
 @CommandPermission(Perm.SPECTATOR)
-@RegisterCommand
-class SpectatorCommand : SporeCommand() {
+@SporeCoreCommand
+class SpectatorCommand : BaseCommand() {
 
     @Default
     @CommandCompletion("@targets")

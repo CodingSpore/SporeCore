@@ -1,11 +1,11 @@
 package me.clearedSpore.sporeCore.commands
 
-import me.clearedSpore.sporeAPI.command.SporeCommand
+import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
-import me.clearedSpore.sporeAPI.annotation.RegisterCommand
+import me.clearedSpore.sporeCore.annotations.SporeCoreCommand
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Material
@@ -15,8 +15,8 @@ import org.bukkit.inventory.ItemStack
 
 @CommandAlias("i|item|give")
 @CommandPermission(Perm.GIVE)
-@RegisterCommand
-class ItemCommand : SporeCommand() {
+@SporeCoreCommand
+class ItemCommand : BaseCommand() {
 
     @Default
     @CommandCompletion("@materials @players|* @range:1-64 @enchantsWithLevels")

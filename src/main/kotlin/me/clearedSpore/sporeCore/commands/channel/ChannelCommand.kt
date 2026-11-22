@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.channel
 
-import me.clearedSpore.sporeAPI.command.SporeCommand
+import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Default
@@ -16,7 +16,7 @@ import org.bukkit.entity.Player
 
 @CommandAlias("%channelalias")
 @CommandPermission(Perm.CHANNEL_ALLOW)
-class ChannelCommand(val channel: Channel) : SporeCommand() {
+class ChannelCommand(val channel: Channel) : BaseCommand() {
 
     @Default
     fun onChannel(player: Player, vararg messageParts: String) {

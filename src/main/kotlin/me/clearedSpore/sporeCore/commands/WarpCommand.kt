@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands
 
-import me.clearedSpore.sporeAPI.command.SporeCommand
+import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.red
@@ -8,7 +8,6 @@ import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
 import me.clearedSpore.sporeAPI.util.Message.sendSuccessMessage
-import me.clearedSpore.sporeAPI.util.log
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
 import me.clearedSpore.sporeCore.features.warp.WarpService
 import me.clearedSpore.sporeCore.menu.util.confirm.ConfirmMenu
@@ -19,7 +18,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 @CommandAlias("warp|warps")
-class WarpCommand : SporeCommand() {
+class WarpCommand : BaseCommand() {
 
     @Dependency
     lateinit var warpService: WarpService

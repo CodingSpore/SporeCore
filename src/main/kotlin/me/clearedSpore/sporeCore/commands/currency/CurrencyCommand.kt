@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.currency
 
-import me.clearedSpore.sporeAPI.command.SporeCommand
+import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.red
@@ -17,7 +17,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 @CommandAlias("%currencyalias")
-class CurrencyCommand : SporeCommand() {
+class CurrencyCommand : BaseCommand() {
 
     private val service = CurrencySystemService
 

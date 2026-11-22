@@ -20,7 +20,6 @@ import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeAPI.util.Message
 import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
 import me.clearedSpore.sporeAPI.util.Webhook
-import me.clearedSpore.sporeAPI.util.log
 import me.clearedSpore.sporeAPI.util.time.TimeUtil
 import me.clearedSpore.sporeCore.CoreConfig
 import me.clearedSpore.sporeCore.DatabaseManager

@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.utilitymenus
 
-import me.clearedSpore.sporeAPI.command.SporeCommand
+import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.red
@@ -10,7 +10,7 @@ import org.bukkit.entity.Player
 
 @CommandAlias("grindstone")
 @CommandPermission(Perm.GRINDSTONE)
-class GrindstoneCommand() : SporeCommand() {
+class GrindstoneCommand() : BaseCommand() {
 
     @Default
     @CommandCompletion("@players")

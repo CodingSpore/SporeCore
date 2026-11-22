@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.moderation
 
-import me.clearedSpore.sporeAPI.command.SporeCommand
+import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.red
@@ -22,7 +22,7 @@ import org.bukkit.entity.Player
 
 @CommandAlias("unban")
 @CommandPermission(Perm.UNBAN)
-class UnBanCommand : SporeCommand() {
+class UnBanCommand : BaseCommand() {
 
     @Default
     @CommandCompletion("@players @removalReasons")

@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.moderation
 
-import me.clearedSpore.sporeAPI.command.SporeCommand
+import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
 import co.aikar.commands.annotation.Optional
 import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
@@ -15,7 +15,7 @@ import java.util.*
 
 @CommandAlias("hist|history|viewpunishments|checkpunishments")
 @CommandPermission(Perm.HISTORY)
-class HistoryCommand : SporeCommand() {
+class HistoryCommand : BaseCommand() {
 
     @Default()
     @CommandCompletion("@players")

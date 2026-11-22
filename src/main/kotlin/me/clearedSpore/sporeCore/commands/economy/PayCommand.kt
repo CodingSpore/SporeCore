@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.economy
 
-import me.clearedSpore.sporeAPI.command.SporeCommand
+import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.green
@@ -27,7 +27,7 @@ import kotlin.collections.contains
 
 @CommandAlias("pay")
 @CommandPermission(Perm.ECO)
-class PayCommand : SporeCommand() {
+class PayCommand : BaseCommand() {
 
     @Default
     @CommandCompletion("@players @payamounts")

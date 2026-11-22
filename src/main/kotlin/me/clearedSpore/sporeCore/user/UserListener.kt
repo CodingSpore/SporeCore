@@ -9,7 +9,6 @@ import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeAPI.util.StringUtil.firstPart
 import me.clearedSpore.sporeAPI.util.StringUtil.hasFlag
 import me.clearedSpore.sporeAPI.util.Webhook
-import me.clearedSpore.sporeAPI.util.log
 import me.clearedSpore.sporeCore.DatabaseManager
 import me.clearedSpore.sporeCore.SporeCore
 import me.clearedSpore.sporeCore.extension.PlayerExtension.uuidStr
@@ -31,10 +30,10 @@ import me.clearedSpore.sporeCore.inventory.InventoryManager
 import me.clearedSpore.sporeCore.inventory.`object`.InventoryData
 import me.clearedSpore.sporeCore.util.Perm
 import me.clearedSpore.sporeCore.util.Util.parsePlaceholders
-import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Sound
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -58,7 +57,7 @@ class UserListener : Listener {
             user.playerName = player.name
         }
 
-        if (!user.hasJoinedBefore) {
+        if (user.hasJoinedBefore == false) {
             val firstServerIP = event.hostname
             user.firstServerIP = firstServerIP
         }
@@ -77,7 +76,7 @@ class UserListener : Listener {
                 PunishmentService.getMessage(ban.type),
                 ban
             )
-            event.disallow(PlayerLoginEvent.Result.KICK_BANNED, Component.text(message))
+            event.disallow(PlayerLoginEvent.Result.KICK_BANNED, message)
 
             if (PunishmentService.config.settings.notifyTry) {
                 val tryTemplate = when (ban.type) {
@@ -110,7 +109,7 @@ class UserListener : Listener {
             if (altPunishment != null && !user.isIPBanExempt) {
                 if (PunishmentService.config.alts.autoBan) {
                     val evasionScreen = PunishmentService.buildAltEvasionScreen(user, altPunishment)
-                    event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text(evasionScreen.joinToString("\n")))
+                    event.disallow(PlayerLoginEvent.Result.KICK_OTHER, evasionScreen.joinToString("\n"))
                 }
 
                 if (PunishmentService.config.alts.notifyStaff) {
@@ -156,7 +155,7 @@ class UserListener : Listener {
     fun onJoin(event: PlayerJoinEvent) {
         val player = event.player
         val user = UserManager.getIfLoaded(player.uniqueId) ?: return
-        val suffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
+        var suffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
         val config = SporeCore.instance.coreConfig
         val joinConfig = SporeCore.instance.coreConfig.join
         val db = DatabaseManager.getServerData()
@@ -179,7 +178,7 @@ class UserListener : Listener {
             user.firstJoin = LocalDateTime.now()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
-            db.totalJoins += 1
+            db.totalJoins = db.totalJoins + 1
 
             if (SporeCore.instance.coreConfig.economy.enabled) {
                 val starter = SporeCore.instance.coreConfig.economy.starterBalance
@@ -190,7 +189,7 @@ class UserListener : Listener {
                 val formatted = msg.replace("%player%", player.name)
                     .replace("%join_count%", db.totalJoins.toString())
                     .translate()
-                Bukkit.broadcast(Component.text(formatted))
+                Bukkit.broadcastMessage(formatted)
             }
 
 
@@ -227,8 +226,7 @@ class UserListener : Listener {
         if (joinConfig.title.isNotBlank()) {
             var title = joinConfig.title
             title = title.replace("%player%", player.name)
-//            player.sendTitle(title.translate(), "")
-            player.showTitle(net.kyori.adventure.title.Title.title(Component.text(title), Component.empty()))
+            player.sendTitle(title.translate(), "")
         }
 
 
@@ -302,13 +300,11 @@ class UserListener : Listener {
             && config.joinLeaveMessages.join.isNotBlank()
             && !autoStaff
             && !VanishService.vanishedPlayers.contains(player.uniqueId)) {
-            event.joinMessage(Component.text(
-                config.joinLeaveMessages.join
-                    .translate()
-                    .parsePlaceholders(player)
-            ))
+            event.joinMessage = config.joinLeaveMessages.join
+                .translate()
+                .parsePlaceholders(player)
         } else if (!config.joinLeaveMessages.enabled) {
-            event.joinMessage(null)
+            event.joinMessage = null
         }
 
         if(user.messages.isNotEmpty()) {
@@ -381,7 +377,7 @@ class UserListener : Listener {
     fun onQuit(event: PlayerQuitEvent) {
         val player = event.player
         val user = UserManager.getIfLoaded(player.uniqueId) ?: return
-        val suffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
+        var suffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
         val config = SporeCore.instance.coreConfig
         val features = SporeCore.instance.coreConfig.features
 
@@ -395,7 +391,7 @@ class UserListener : Listener {
 
         if (features.modes && ModeService.isInMode(player)) {
             Logger.log(suffix, player, Perm.LOG, "&rleft the game silently", false)
-            event.quitMessage(null)
+            event.quitMessage = null
             wasVanished = true
             ModeService.toggleMode(player, playerIssued = false)
             VanishService.unVanish(player.uniqueId, playerIssued = false)
@@ -432,16 +428,14 @@ class UserListener : Listener {
         UserManager.remove(player.uniqueId)
 
         if (wasVanished) {
-            event.quitMessage(null)
+            event.quitMessage = null
         } else {
             if (config.joinLeaveMessages.enabled && config.joinLeaveMessages.leave.isNotBlank()) {
-                event.quitMessage(Component.text(
-                    config.joinLeaveMessages.leave
-                        .translate()
-                        .parsePlaceholders(player)
-                ))
+                event.quitMessage = config.joinLeaveMessages.leave
+                    .translate()
+                    .parsePlaceholders(player)
             } else if (!config.joinLeaveMessages.enabled) {
-                event.quitMessage(null)
+                event.quitMessage = null
             }
 
         }

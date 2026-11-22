@@ -20,14 +20,14 @@ object VanishService {
 
     var vanishedPlayers: MutableList<UUID> = mutableListOf()
 
-    fun vanish(uuid: UUID, playerIssued: Boolean) {
+    fun vanish(uuid: UUID) {
         val userPlayer = Bukkit.getPlayer(uuid) ?: return
         val wasInMode = ModeService.isInMode(userPlayer)
 
         vanishedPlayers.add(uuid)
         userPlayer.isSleepingIgnored = true
         val config = SporeCore.instance.coreConfig
-        if (!wasInMode && config.joinLeaveMessages.vanish && config.joinLeaveMessages.leave.isNotEmpty() && playerIssued) {
+        if (!wasInMode && config.joinLeaveMessages.vanish && config.joinLeaveMessages.leave.isNotEmpty()) {
             Bukkit.broadcastMessage(
                 config.joinLeaveMessages.leave
                     .translate()
@@ -40,7 +40,7 @@ object VanishService {
             player.hidePlayer(SporeCore.instance, userPlayer)
         }
 
-        if (SporeCore.instance.coreConfig.discord.chat.isNotEmpty() && !wasInMode && playerIssued) {
+        if (SporeCore.instance.coreConfig.discord.chat.isNotEmpty() && !wasInMode) {
             val embed = Webhook.Embed()
                 .setColor(0xFF0000)
                 .setDescription("**${userPlayer.name} left the server**")
@@ -67,7 +67,7 @@ object VanishService {
     }
 
 
-    fun unVanish(uuid: UUID, playerIssued: Boolean) {
+    fun unVanish(uuid: UUID) {
         val userPlayer = Bukkit.getPlayer(uuid) ?: return
         val wasInMode = ModeService.isInMode(userPlayer)
 
@@ -78,14 +78,14 @@ object VanishService {
         vanishedPlayers.remove(uuid)
         userPlayer.isSleepingIgnored = false
         val config = SporeCore.instance.coreConfig
-        if (!wasInMode && config.joinLeaveMessages.vanish && config.joinLeaveMessages.join.isNotEmpty() && playerIssued) {
+        if (!wasInMode && config.joinLeaveMessages.vanish && config.joinLeaveMessages.join.isNotEmpty()) {
             Bukkit.broadcastMessage(
                 config.joinLeaveMessages.join
                     .translate()
                     .parsePlaceholders(userPlayer))
         }
 
-        if (SporeCore.instance.coreConfig.discord.chat.isNotEmpty() && !wasInMode && playerIssued) {
+        if (SporeCore.instance.coreConfig.discord.chat.isNotEmpty() && !wasInMode) {
             val embed = Webhook.Embed()
                 .setColor(0x00FF00)
                 .setDescription("**${userPlayer.name} joined the server**")
@@ -111,11 +111,11 @@ object VanishService {
         }
     }
 
-    fun toggle(uuid: UUID, playerIssued: Boolean) {
+    fun toggle(uuid: UUID) {
         if (isVanished(uuid)) {
-            unVanish(uuid, playerIssued)
+            unVanish(uuid)
         } else {
-            vanish(uuid, playerIssued)
+            vanish(uuid)
         }
     }
 

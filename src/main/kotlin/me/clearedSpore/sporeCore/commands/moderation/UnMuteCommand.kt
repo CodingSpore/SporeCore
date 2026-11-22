@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.moderation
 
-import me.clearedSpore.sporeAPI.command.SporeCommand
+import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.red
@@ -22,7 +22,7 @@ import org.bukkit.entity.Player
 
 @CommandAlias("unmute")
 @CommandPermission(Perm.UNMUTE)
-class UnMuteCommand : SporeCommand() {
+class UnMuteCommand : BaseCommand() {
 
     @Default
     @CommandCompletion("@players @removalReasons")

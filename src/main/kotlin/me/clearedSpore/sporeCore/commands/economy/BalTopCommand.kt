@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.economy
 
-import me.clearedSpore.sporeAPI.command.SporeCommand
+import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Default
@@ -18,7 +18,7 @@ import org.bukkit.entity.Player
 
 @CommandAlias("baltop|ecotop")
 @CommandPermission(Perm.ECO)
-class BalTopCommand : SporeCommand() {
+class BalTopCommand : BaseCommand() {
 
     @Default
     fun onTop(sender: CommandSender, @Optional page: Int?) {

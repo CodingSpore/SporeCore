@@ -1,12 +1,12 @@
 package me.clearedSpore.sporeCore.commands
 
-import me.clearedSpore.sporeAPI.command.SporeCommand
+import co.aikar.commands.BaseCommand
 import co.aikar.commands.InvalidCommandArgument
 import co.aikar.commands.annotation.*
-import me.clearedSpore.sporeAPI.annotation.RegisterCommand
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeCore.acf.targets.`object`.TargetPlayers
+import me.clearedSpore.sporeCore.annotations.SporeCoreCommand
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.command.CommandSender
@@ -14,8 +14,8 @@ import org.bukkit.entity.Player
 
 @CommandAlias("invulnerable|god")
 @CommandPermission(Perm.GOD)
-@RegisterCommand
-class GodCommand : SporeCommand() {
+@SporeCoreCommand
+class GodCommand : BaseCommand() {
 
     @Default
     @CommandCompletion("@targets")
