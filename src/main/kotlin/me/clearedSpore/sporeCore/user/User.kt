@@ -58,7 +58,7 @@ data class User(
     var chatFormat: ChatFormat? = null,
     var punishments: MutableList<Punishment> = mutableListOf(),
     var lastIp: String? = null,
-    var isIPBanExempt: Boolean,
+    var isIPBanExempt: Boolean = false,
     var ipHistory: MutableList<String> = mutableListOf(),
     var channel: String? = null,
     var staffStats: MutableList<StaffPunishmentStats> = mutableListOf(),

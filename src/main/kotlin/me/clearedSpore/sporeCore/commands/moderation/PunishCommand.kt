@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.moderation
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeCore.features.punishment.PunishmentService
@@ -15,7 +15,7 @@ import org.bukkit.entity.Player
 
 @CommandAlias("punish|p")
 @CommandPermission(Perm.PUNISH)
-class PunishCommand : BaseCommand() {
+class PunishCommand : SporeCommand() {
 
     @Default
     @CommandCompletion("@players @reasons")

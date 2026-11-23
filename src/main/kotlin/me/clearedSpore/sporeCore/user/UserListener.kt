@@ -9,6 +9,7 @@ import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeAPI.util.StringUtil.firstPart
 import me.clearedSpore.sporeAPI.util.StringUtil.hasFlag
 import me.clearedSpore.sporeAPI.util.Webhook
+import me.clearedSpore.sporeAPI.util.log
 import me.clearedSpore.sporeCore.DatabaseManager
 import me.clearedSpore.sporeCore.SporeCore
 import me.clearedSpore.sporeCore.extension.PlayerExtension.uuidStr
@@ -57,7 +58,7 @@ class UserListener : Listener {
             user.playerName = player.name
         }
 
-        if (user.hasJoinedBefore == false) {
+        if (!user.hasJoinedBefore) {
             val firstServerIP = event.hostname
             user.firstServerIP = firstServerIP
         }

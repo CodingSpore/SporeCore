@@ -16,6 +16,7 @@ import me.clearedSpore.sporeCore.features.investigation.`object`.enum.Investigat
 import me.clearedSpore.sporeCore.menu.investigation.manage.suspect.SuspectMenu
 import me.clearedSpore.sporeCore.menu.util.confirm.ConfirmMenu
 import me.clearedSpore.sporeAPI.util.ItemBuilder
+import me.clearedSpore.sporeAPI.util.log
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Material
 import org.bukkit.entity.Player

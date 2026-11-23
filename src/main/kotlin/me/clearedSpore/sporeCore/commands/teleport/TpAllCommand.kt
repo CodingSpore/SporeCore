@@ -9,6 +9,7 @@ import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeAPI.util.Message.sendSuccessMessage
 import me.clearedSpore.sporeCore.SporeCore
 import me.clearedSpore.sporeAPI.annotation.RegisterCommand
+import me.clearedSpore.sporeAPI.util.log
 import me.clearedSpore.sporeCore.extension.PlayerExtension.uuidStr
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
 import me.clearedSpore.sporeCore.features.logs.LogsService

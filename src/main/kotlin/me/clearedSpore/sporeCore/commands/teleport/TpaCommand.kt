@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.teleport
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandCompletion
 import co.aikar.commands.annotation.Default
@@ -8,7 +8,7 @@ import co.aikar.commands.bukkit.contexts.OnlinePlayer
 import org.bukkit.entity.Player
 
 @CommandAlias("tpa")
-class TpaCommand : BaseCommand() {
+class TpaCommand : SporeCommand() {
 
     @Default
     @CommandCompletion("@players")

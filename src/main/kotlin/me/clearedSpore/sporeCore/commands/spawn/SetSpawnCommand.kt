@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.spawn
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Default
@@ -12,7 +12,7 @@ import org.bukkit.entity.Player
 
 @CommandAlias("setspawn")
 @CommandPermission(Perm.SETSPAWN)
-class SetSpawnCommand() : BaseCommand() {
+class SetSpawnCommand() : SporeCommand() {
 
 
     @Default()

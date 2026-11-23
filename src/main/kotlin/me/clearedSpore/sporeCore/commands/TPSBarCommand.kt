@@ -10,8 +10,9 @@ import me.clearedSpore.sporeCore.extension.PlayerExtension.userFail
 import me.clearedSpore.sporeCore.user.UserManager
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Command
 
-@CommandAlias("tpsbar")
+@Command("tpsbar")
 @CommandPermission(Perm.TPSBAR)
 @RegisterCommand
 class TPSBarCommand : SporeCommand() {

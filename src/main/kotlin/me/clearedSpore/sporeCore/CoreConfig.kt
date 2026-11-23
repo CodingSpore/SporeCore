@@ -123,16 +123,46 @@ data class DiscordConfig(
         "If you don't want this feature leave it empty"
     )
     var chat: String = "",
+    @Comment(
+        "When a user sends a message in chat via Discord",
+        "you can make it send in-game.",
+        "If you don't want this feature leave it empty"
+    )
+    var chatID: String = "",
+
+    @Comment(
+        "Set a custom activity on your bot",
+        "to display certain information",
+        "about your server.",
+        "You can also change the status indicator",
+        "of the bot!",
+        "You can set the activity to 'NONE' if you wish ",
+        "to display nothing on the bots activity status",
+        "Statuses: ONLINE, IDLE, DO_NOT_DISTURB",
+        "THESE CHANGES WILL REQUIRE A RESTART",
+    )
+    var activity: String = "NONE",
+    var status: String = "ONLINE",
+
+    @Comment(
+        "Customize how messages sent ",
+        "from Discord appear in-game",
+        "Placeholders:",
+        "%channel% -> The name of the channel the message was sent in",
+        "%author% -> The name of the author who sent the message",
+        "%message% -> The sent message's content"
+    )
+    var discordFormat: String = "&f[&#5865F2&lDiscord&r&f] &f%author% &r&8» &f%message%",
 
     @Comment(
         "Do you want it to send death messages to discord?"
     )
-    var deathMessages: Boolean = true,
-
-    @Comment(
-        "Do you want it to send a message when someone achieves an advancement?"
-    )
-    var advancements: Boolean = true,
+    var deathMessages: Boolean = true
+//
+//    @Comment(
+//        "Do you want it to send a message when someone achieves an advancement?"
+//    )
+//    var advancements: Boolean = false,
 )
 
 @Configuration
@@ -477,6 +507,8 @@ data class ChatChannelsConfig(
         "staff" to ChannelConfig(
             "Staff",
             "staff",
+            "",
+            "",
             "sporecore.channel.staff",
             "&b&lStaff",
             "&b&lStaff &7-> &9%ranksuffix%%player%&f: %message%",
@@ -486,6 +518,8 @@ data class ChatChannelsConfig(
         "admin" to ChannelConfig(
             "Admin",
             "admin",
+            "",
+            "",
             "sporecore.channel.admin",
             "&c&lAdmin",
             "&c&lAdmin &7-> &c%ranksuffix%%player%&f: %message%",
@@ -499,10 +533,12 @@ data class ChatChannelsConfig(
 data class ChannelConfig(
     var name: String = "Staff",
     var id: String = "staff",
+    var discordWebhook: String = "",
+    var discordID: String = "",
     var permission: String = "sporecore.channel.staff",
     var prefix: String = "&b&lStaff",
     var message: String = "&b&lStaff &7-> &9%ranksuffix%%player%&f: %message%",
-    var commands: List<String> = listOf("staff", "sc"),
+    var commands: List<String> = listOf(),
     var symbol: String = "#"
 )
 
@@ -624,6 +660,11 @@ data class GeneralConfig(
         "player is not vanished!"
     )
     var vanishTag: String = " &7[&bV&7]",
+
+    @Comment(
+        "Sets the name of the server.",
+    )
+    var serverName: String = "undefined",
 
     @Comment(
         "Commands that can be run when a player",
@@ -799,6 +840,8 @@ data class FeaturesConfig(
     var coloredChat: Boolean = true,
 
     var kits: Boolean = true,
+
+    var commandSpy: Boolean = true,
 
     var stats: Boolean = true,
 

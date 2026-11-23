@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands.utilitymenus
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.red
@@ -10,7 +10,7 @@ import org.bukkit.entity.Player
 
 @CommandAlias("smithingtable|smith")
 @CommandPermission(Perm.SMITHING)
-class SmithingTableCommand() : BaseCommand() {
+class SmithingTableCommand() : SporeCommand() {
 
     @Default
     @CommandCompletion("@players")

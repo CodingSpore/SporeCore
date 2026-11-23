@@ -3,6 +3,11 @@ package me.clearedSpore.sporeCore
 import co.aikar.commands.*
 import de.exlll.configlib.ConfigurationException
 import de.exlll.configlib.YamlConfigurations
+import io.leangen.geantyref.TypeToken
+import io.papermc.paper.command.brigadier.CommandSourceStack
+import me.clearedSpore.sporeAPI.SporePlugin
+import me.clearedSpore.sporeAPI.command.SporeCommand
+import me.clearedSpore.sporeAPI.command.cloud.SporeCloudCommandManager
 import me.clearedSpore.sporeAPI.task.Tasks
 import me.clearedSpore.sporeAPI.util.*
 import me.clearedSpore.sporeAPI.util.CC.blue
@@ -21,7 +26,6 @@ import me.clearedSpore.sporeCore.acf.targets.`object`.TargetPlayers
 import me.clearedSpore.sporeCore.acf.targets.`object`.TargetSinglePlayer
 import me.clearedSpore.sporeCore.acf.targets.resolver.AnyTargetResolver
 import me.clearedSpore.sporeCore.acf.targets.resolver.SinglePlayerResolver
-import me.clearedSpore.sporeCore.annotations.Setting
 import me.clearedSpore.sporeCore.commands.*
 import me.clearedSpore.sporeCore.commands.channel.ChannelCommand
 import me.clearedSpore.sporeCore.commands.currency.CurrencyCommand
@@ -73,15 +77,13 @@ import me.clearedSpore.sporeCore.features.warp.WarpService
 import me.clearedSpore.sporeCore.hook.PlaceholderAPIHook
 import me.clearedSpore.sporeCore.inventory.InventoryManager
 import me.clearedSpore.sporeCore.listener.InventoryListener
-import me.clearedSpore.sporeCore.task.ActionBarTicker
 import me.clearedSpore.sporeCore.task.TpsTask
 import me.clearedSpore.sporeCore.task.VanishTask
 import me.clearedSpore.sporeCore.user.UserListener
 import me.clearedSpore.sporeCore.user.UserManager
+import me.clearedSpore.sporeCore.util.CommandSuggestions
 import me.clearedSpore.sporeCore.util.Perm
 import me.clearedSpore.sporeCore.util.UpdateChecker
-import me.clearedSpore.sporeCore.util.registry.CommandRegistry
-import me.clearedSpore.sporeCore.util.registry.ListenerRegistry
 import net.milkbowl.vault.chat.Chat
 import net.milkbowl.vault.economy.Economy
 import net.milkbowl.vault.permission.Permission
@@ -95,14 +97,11 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.plugin.ServicePriority
-import org.bukkit.plugin.java.JavaPlugin
-import org.w3c.dom.Attr
+import org.incendo.cloud.bukkit.parser.selector.MultiplePlayerSelectorParser
 import java.io.File
-import java.net.URLClassLoader
-import java.util.jar.JarFile
 
 
-class SporeCore : JavaPlugin() {
+class SporeCore : SporePlugin() {
 
     companion object {
         lateinit var instance: SporeCore
@@ -110,6 +109,7 @@ class SporeCore : JavaPlugin() {
     }
 
     lateinit var commandManager: PaperCommandManager
+    lateinit var commandManager2: SporeCloudCommandManager
 
     lateinit var coreConfig: CoreConfig
     lateinit var database: Database
@@ -133,7 +133,7 @@ class SporeCore : JavaPlugin() {
     var freshStartup = true
 
 
-    override fun onEnable() {
+    override fun onPluginEnable() {
         totalCommands = 0
         instance = this
 
@@ -157,6 +157,7 @@ class SporeCore : JavaPlugin() {
         Logger.info("Loading SporeCore")
         Message.init(true)
         commandManager = PaperCommandManager(this)
+        setupCloud()
         setupACF()
         Tasks.onInitialize(this)
         Perm.registerAll()
@@ -180,8 +181,6 @@ class SporeCore : JavaPlugin() {
                 Logger.info("Successfully integrated with PlaceholderAPI")
             }
         }
-
-        ActionBarTicker.start()
 
         val features = coreConfig.features
 
@@ -234,7 +233,6 @@ class SporeCore : JavaPlugin() {
         Cooldown.createCooldown("report", coreConfig.reports.reportCooldown)
         PaymentCooldownService.init()
 
-        ListenerRegistry.registerAll()
         registerListeners()
         registerCompletions()
         registerCommands()
@@ -258,7 +256,7 @@ class SporeCore : JavaPlugin() {
         }
     }
 
-    override fun onDisable() {
+    override fun onPluginDisable() {
         val features = coreConfig.features
         val consoleHeadURL = DiscordService.getConsoleAvatar()
 
@@ -282,7 +280,7 @@ class SporeCore : JavaPlugin() {
         if (features.vanish) {
             Logger.info("Unvanishing everyone....")
             val vanished = VanishService.vanishedPlayers.size
-            VanishService.vanishedPlayers.forEach { uuid -> VanishService.unVanish(uuid) }
+            VanishService.vanishedPlayers.forEach { uuid -> VanishService.unVanish(uuid, false) }
             Logger.info("Unvanished $vanished players")
 
             VanishTask.stop()
@@ -296,7 +294,6 @@ class SporeCore : JavaPlugin() {
             ReportService.cleanupReports()
             ReportService.stopCleanupTask()
         }
-        ActionBarTicker.stop()
         InventoryManager.stopCleanupTask()
 
 
@@ -588,13 +585,22 @@ class SporeCore : JavaPlugin() {
 
             Logger.info("Registered currency aliases: ${aliases.joinToString(", ")}")
         }
-
-        CommandRegistry.registerAll(manualCommands)
-
     }
 
-    fun registerCommand(command: BaseCommand) {
+    fun registerCommand(command: SporeCommand) {
         manualCommands.add(command)
+        commandManager.registerCommand(command)
+        cloudCommandManager.register(command)
+    }
+
+    override fun setupCloud(manager: SporeCloudCommandManager) {
+        cloudCommandManager.manager.brigadierManager().setNativeNumberSuggestions(true)
+
+        val parserType = object : TypeToken<MultiplePlayerSelectorParser<CommandSourceStack>>() {}
+
+        cloudCommandManager.manager.brigadierManager().setNativeSuggestions(parserType, true)
+
+        CommandSuggestions.register(cloudCommandManager.manager)
     }
 
     fun setupACF() {

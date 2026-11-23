@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Default
@@ -24,7 +24,7 @@ import org.dizitart.no2.filters.FluentFilter.where
 
 @CommandAlias("investigation")
 @CommandPermission(Perm.INVESTIGATION_STAFF)
-class InvestigationCommand : BaseCommand() {
+class InvestigationCommand : SporeCommand() {
 
     val service = IGService
 

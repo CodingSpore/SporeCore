@@ -1,12 +1,13 @@
 package me.clearedSpore.sporeCore.commands.moderation
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import co.aikar.commands.bukkit.contexts.OnlinePlayer
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Logger
+import me.clearedSpore.sporeAPI.util.log
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
 import me.clearedSpore.sporeCore.features.vanish.VanishService
 import me.clearedSpore.sporeCore.util.Perm
@@ -17,7 +18,7 @@ import org.bukkit.entity.Player
 
 @CommandAlias("vanish|v")
 @CommandPermission(Perm.VANISH)
-class VanishCommand : BaseCommand() {
+class VanishCommand : SporeCommand() {
 
     @Default
     @CommandCompletion("@players")

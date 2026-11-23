@@ -1,5 +1,6 @@
 package me.clearedSpore.sporeCore.inventory
 
+import me.clearedSpore.sporeAPI.task.SporeScheduledTask
 import me.clearedSpore.sporeAPI.task.Tasks
 import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeAPI.util.time.TimeUtil
@@ -21,7 +22,7 @@ object InventoryManager {
     internal val inventoryCollection get() = DatabaseManager.getInventoryCollection()
 
     private val cachedInventories = mutableMapOf<String, InventoryData>()
-    private var cleanupTask: BukkitTask? = null
+    private var cleanupTask: SporeScheduledTask? = null
 
     fun loadAllInventories(collection: NitriteCollection) {
         var loaded = 0

@@ -1,6 +1,6 @@
 package me.clearedSpore.sporeCore.commands
 
-import co.aikar.commands.BaseCommand
+import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
@@ -25,7 +25,7 @@ import org.bukkit.entity.Player
 import org.dizitart.no2.filters.FluentFilter.where
 
 @CommandAlias("report|reports")
-class ReportCommand : BaseCommand() {
+class ReportCommand : SporeCommand() {
 
     @Default()
     @CommandCompletion("@players")
