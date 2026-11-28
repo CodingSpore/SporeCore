@@ -37,7 +37,7 @@ class GamemodeCommand : SporeCommand() {
         @Argument("gamemode", suggestions = "gamemodes") gamemode: String,
         @Argument("targets", suggestions = "players") targets: MultiplePlayerSelector?
     ) {
-        val suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.translate() ?: "" else ""
+        val suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.legacyToMiniMessage() ?: "" else ""
 
         val mode = try {
             GameMode.valueOf(gamemode.uppercase())

@@ -51,7 +51,7 @@ object InventoryManager {
 
     fun startCleanupTask() {
         cleanupTask?.cancel()
-        cleanupTask = Tasks.runRepeatedAsync(1.hours.toTicks(), 1.hours.toTicks()) { cleanupExpired() }
+        cleanupTask = Tasks.runRepeatedAsync(1.hours.toTicks(), 1.hours.toTicks()) { cleanupExpiredOrAll(false) }
     }
 
     fun hasPendingInventory(playerId: UUID): Boolean {
@@ -80,7 +80,7 @@ object InventoryManager {
 
     fun clearAll() {
         cachedInventories.clear()
-        inventoryCollection.clear()
+        cleanupExpiredOrAll(true)
     }
 
 
@@ -171,24 +171,34 @@ object InventoryManager {
     }
 
 
-    fun cleanupExpired() {
+    fun cleanupExpiredOrAll(force: Boolean) {
         Logger.infoDB("Clearing inventories....")
         val config = SporeCore.instance.coreConfig.inventories
         val maxAge = TimeUtil.parse(config.deletion).millis
         val now = System.currentTimeMillis()
 
-        val toRemove = cachedInventories.values.filter { now - it.timestamp >= maxAge }
+        Tasks.runAsync {
+            val toRemove =
+                if (!force) cachedInventories.values.filter { now - it.timestamp >= maxAge }
+                else cachedInventories.values
 
-        if (toRemove.isEmpty()) return
+            if (toRemove.isEmpty()) {
+                Logger.infoDB("There are no inventories to clear")
+                return@runAsync
+            }
 
-        Logger.infoDB("Removing ${toRemove.size} inventories")
+            Logger.infoDB("Removing ${toRemove.size} inventories")
 
-        toRemove.forEach {
-            cachedInventories.remove(it.id)
-            inventoryCollection.remove(FluentFilter.where("id").eq(it.id))
+            toRemove.forEach {
+                cachedInventories.remove(it.id)
+                inventoryCollection.remove(FluentFilter.where("id").eq(it.id))
+            }
+            val end = System.currentTimeMillis()
+            val total = end - now
+            Logger.infoDB("Removed ${toRemove.size} inventories. §7(${total}ms)")
         }
 
-        Logger.infoDB("Removed ${toRemove.size} inventories")
+
     }
 }
 

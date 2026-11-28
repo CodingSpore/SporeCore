@@ -20,6 +20,7 @@ import me.clearedSpore.sporeAPI.util.Cooldown
 import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeAPI.util.Message
 import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
+import me.clearedSpore.sporeAPI.util.Message.sendSuccessMessage
 import me.clearedSpore.sporeAPI.util.Webhook
 import me.clearedSpore.sporeAPI.util.log
 import me.clearedSpore.sporeAPI.util.time.TimeUtil
@@ -37,6 +38,7 @@ import me.clearedSpore.sporeCore.features.currency.`object`.CreditLog
 import me.clearedSpore.sporeCore.features.currency.`object`.PackagePurchase
 import me.clearedSpore.sporeCore.features.discord.DiscordService
 import me.clearedSpore.sporeCore.features.eco.EconomyService
+import me.clearedSpore.sporeCore.features.logs.LogsService.cleanupLogs
 import me.clearedSpore.sporeCore.features.mode.ModeService
 import me.clearedSpore.sporeCore.features.punishment.PunishmentService
 import me.clearedSpore.sporeCore.features.punishment.`object`.PunishmentType
@@ -52,10 +54,12 @@ import me.clearedSpore.sporeCore.util.button.CallbackRegistry
 import me.clearedSpore.sporeCore.util.button.TextButton
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
+import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Permission
+import java.awt.Color
 import java.io.File
 import java.util.*
 import java.util.concurrent.CompletableFuture
@@ -756,10 +760,63 @@ class CoreCommand : SporeCommand() {
         }
     }
 
+    @Command("sporecore deletealllogs [confirm]")
+    @Command("core deletealllogs [confirm]")
+    @Permission(Perm.ADMIN)
+    fun onDeleteLogs(sender: CommandSender, @Argument("confirm") confirm: String?) {
+        val dcConfig = SporeCore.instance.coreConfig.discord
+        check(sender is ConsoleCommandSender) {
+            sender.sendErrorMessage("Only console can execute this command")
+            return
+        }
+
+        if (confirm.isNullOrEmpty() || confirm != "confirm") {
+            Logger.error("")
+            Logger.error("            §c§lWARNING              ")
+            Logger.error("§9Are you sure you want to do this?")
+            Logger.error("§9You are about to clear all logs")
+            Logger.error("§c§nThis action cannot be undone!")
+            Logger.error("§9Run §f/sporecore deletealllogs confirm" + "§9 to confirm")
+            Logger.error("")
+            return
+        }
+
+        if (dcConfig.rollback.isNotEmpty()) {
+            Tasks.runAsync {
+                try {
+
+                    val webhook = Webhook(dcConfig.rollback)
+
+                    if (dcConfig.rollbackPing.isNotEmpty()) {
+                        webhook.setMessage(dcConfig.rollbackPing)
+                    }
+
+                    val embed = Webhook.Embed()
+                        .setTitle("Logs Cleared")
+                        .setColor(0xFF0000)
+                        .setAuthor("Console", DiscordService.getConsoleAvatar())
+                        .setDescription("All logs have been cleared through Console. If this wasn't authorized, please check console logs to see who executed this.")
+
+
+                    webhook.setProfileURL(DiscordService.getConsoleAvatar())
+                    webhook.setUsername("Console")
+                    webhook.addEmbed(embed)
+
+                    webhook.send()
+                } catch (e: Exception) {
+                    Logger.error("Failed to send discord message!")
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        cleanupLogs(true)
+    }
+
 
     fun displayPendingInventories(sender: CommandSender, user: User) {
         if (user.pendingInventories.isEmpty()) {
-            sender.sendMessage("   User has no pending inventories".red())
+            sender.sendMessage("User has no pending inventories".red())
             return
         }
 

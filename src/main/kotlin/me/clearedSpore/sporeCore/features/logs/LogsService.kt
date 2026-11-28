@@ -53,23 +53,31 @@ object LogsService {
         cleanupTask = null
     }
 
-    fun cleanupLogs() {
+    fun cleanupLogs(force: Boolean = false) {
         Logger.infoDB("Clearing logs...")
         val config = SporeCore.instance.coreConfig.logs
         val maxAge = TimeUtil.parse(config.cleanupTime).millis
         val now = System.currentTimeMillis()
 
-        val toRemove = logsCollection.find().map { Log.fromDocument(it) }.filter { now - it.timestamp >= maxAge }
+        Tasks.runAsync { val toRemove = if (!force)
+            logsCollection.find().map { Log.fromDocument(it) }.filter { now - it.timestamp >= maxAge }
+        else logsCollection.find().map { Log.fromDocument(it) }
 
-        if (toRemove.isEmpty()) return
+            if (toRemove.isEmpty()) {
+                Logger.infoDB("There are no logs to clear")
+                return@runAsync
+            }
 
-        Logger.infoDB("Removing ${toRemove.size} logs")
+            Logger.infoDB("Removing ${toRemove.size} logs")
 
-        toRemove.forEach {
-            logsCollection.remove(where("id").eq(it.id))
-        }
+            toRemove.forEach {
+                logsCollection.remove(where("id").eq(it.id))
+            }
+            val end = System.currentTimeMillis()
+            val total = end - now
+            Logger.infoDB("Removed ${toRemove.size} logs. §7(${total}ms)") }
 
-        Logger.infoDB("Removed ${toRemove.size} logs")
+
     }
 
 
