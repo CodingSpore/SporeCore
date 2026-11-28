@@ -18,7 +18,7 @@ class HistoryMenu(
     val viewer: Player,
     val target: OfflinePlayer
 ) : Menu(SporeCore.instance) {
-//    var suffix = ChatService.getSuffix(target as Player)?.translate() ?: ""
+//    var suffix = ChatService.getSuffix(target as Player)?.legacyToMiniMessage() ?: ""
     override fun getMenuName(): String {
         return "History | ${target.name}"
     }

@@ -4,6 +4,7 @@ import me.clearedSpore.sporeAPI.exception.LoggedException
 import me.clearedSpore.sporeAPI.task.Tasks
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.bold
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeAPI.util.StringUtil.firstPart
@@ -156,7 +157,7 @@ class UserListener : Listener {
     fun onJoin(event: PlayerJoinEvent) {
         val player = event.player
         val user = UserManager.getIfLoaded(player.uniqueId) ?: return
-        var suffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
+        var suffix = chatService?.getPlayerSuffix(player)?.legacyToMiniMessage() ?: ""
         val config = SporeCore.instance.coreConfig
         val joinConfig = SporeCore.instance.coreConfig.join
         val db = DatabaseManager.getServerData()
@@ -179,7 +180,7 @@ class UserListener : Listener {
             user.firstJoin = LocalDateTime.now()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
-            db.totalJoins = db.totalJoins + 1
+            db.totalJoins += 1
 
             if (SporeCore.instance.coreConfig.economy.enabled) {
                 val starter = SporeCore.instance.coreConfig.economy.starterBalance
@@ -284,6 +285,7 @@ class UserListener : Listener {
                 }
         }
 
+        user.pruneHistory()
         UserManager.save(user)
 
 
@@ -378,7 +380,7 @@ class UserListener : Listener {
     fun onQuit(event: PlayerQuitEvent) {
         val player = event.player
         val user = UserManager.getIfLoaded(player.uniqueId) ?: return
-        var suffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
+        var suffix = chatService?.getPlayerSuffix(player)?.legacyToMiniMessage() ?: ""
         val config = SporeCore.instance.coreConfig
         val features = SporeCore.instance.coreConfig.features
 
@@ -417,8 +419,8 @@ class UserListener : Listener {
         }
 
         val quitTime = System.currentTimeMillis()
+        user.addSession(joinTime, quitTime)
         user.totalPlaytime += quitTime - joinTime
-        user.playtimeHistory.add(joinTime to quitTime)
 
         val twoWeeksAgo = System.currentTimeMillis() - (14L * 24 * 60 * 60 * 1000)
         user.playtimeHistory.removeIf { it.first < twoWeeksAgo }

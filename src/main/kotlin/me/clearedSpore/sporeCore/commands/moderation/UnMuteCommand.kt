@@ -3,6 +3,7 @@ package me.clearedSpore.sporeCore.commands.moderation
 import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Message
@@ -58,8 +59,8 @@ class UnMuteCommand : SporeCommand() {
         var targetSuffix = ""
 
         if (sender is Player) {
-            suffix = chatService?.getPlayerSuffix(sender)?.translate() ?: ""
-            targetSuffix = if (Bukkit.getOnlinePlayers().contains(target.player)) chatService?.getPlayerSuffix(targetUser.player)?.translate() ?: "" else ""
+            suffix = chatService?.getPlayerSuffix(sender)?.legacyToMiniMessage() ?: ""
+            targetSuffix = if (Bukkit.getOnlinePlayers().contains(target.player)) chatService?.getPlayerSuffix(targetUser.player)?.legacyToMiniMessage() ?: "" else ""
 
             format = PunishmentService.config.logs.unMute
                 .replace("%ranksuffix%", suffix)

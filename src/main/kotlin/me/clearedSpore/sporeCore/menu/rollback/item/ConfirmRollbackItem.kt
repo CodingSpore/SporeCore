@@ -4,6 +4,7 @@ package me.clearedSpore.sporeCore.menu.rollback.item
 import me.clearedSpore.sporeAPI.menu.item.Item
 import me.clearedSpore.sporeAPI.task.Tasks
 import me.clearedSpore.sporeAPI.util.CC.blue
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeAPI.util.Webhook
@@ -37,7 +38,7 @@ class ConfirmRollbackItem(
     }
 
     override fun onClickEvent(clicker: Player, clickType: ClickType) {
-        var suffix = chatService?.getPlayerSuffix(clicker)?.translate() ?: ""
+        var suffix = chatService?.getPlayerSuffix(clicker)?.legacyToMiniMessage() ?: ""
         clicker.closeInventory()
 
         Tasks.runAsync {

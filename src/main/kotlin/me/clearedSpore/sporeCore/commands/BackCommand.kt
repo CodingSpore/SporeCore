@@ -11,14 +11,14 @@ import me.clearedSpore.sporeCore.user.UserManager
 import me.clearedSpore.sporeCore.util.Perm
 import me.clearedSpore.sporeCore.util.TeleportService.awaitTeleport
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
-
-@CommandAlias("back")
-@CommandPermission(Perm.BACK)
 @RegisterCommand
 class BackCommand : SporeCommand() {
 
-    @Default
+    @Command("back")
+    @Permission(Perm.BACK)
     fun onBack(player: Player) {
         val user = UserManager.get(player)
         if (user == null) {

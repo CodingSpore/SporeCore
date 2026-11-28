@@ -13,13 +13,13 @@ import me.clearedSpore.sporeCore.user.UserManager
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
-@CommandAlias("socialspy")
 class SocialSpyCommand : SporeCommand() {
 
-
-    @Subcommand("command")
-    @CommandPermission(Perm.COMMAND_SPY)
+    @Command("socialspy command")
+    @Permission(Perm.COMMAND_SPY)
     fun onCommandSpy(sender: CommandSender) {
         if (sender !is Player) sender.sendErrorMessage("Only players can use this command.")
         val user = UserManager.get(sender.name) ?: return
@@ -36,9 +36,8 @@ class SocialSpyCommand : SporeCommand() {
 
     }
 
-
-    @Default
-    @CommandPermission(Perm.MSG_SPY)
+    @Command("socialspy")
+    @Permission(Perm.MSG_SPY)
     fun onSocialSpy(sender: CommandSender) {
         if (sender !is Player) sender.sendErrorMessage("Only players can use this command.")
         val user = UserManager.get(sender.name) ?: return

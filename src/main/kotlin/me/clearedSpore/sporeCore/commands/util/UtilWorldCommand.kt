@@ -13,16 +13,18 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
 @CommandAlias("util")
 @CommandPermission(Perm.UTIL_COMMAND)
 @RegisterCommand
 class UtilWorldCommand : SporeCommand() {
 
-    @Subcommand("world name")
-    @CommandPermission(Perm.UTIL_WORLD)
-    @CommandCompletion("@worlds")
-    fun worldName(sender: CommandSender, @Optional @Name("world") worldName: String? = null) {
+    @Command("util world name <world>")
+    @Permission(Perm.UTIL_WORLD)
+    fun worldName(sender: CommandSender, @Argument("world", suggestions = "worlds") worldName: String? = null) {
         val world = if (worldName != null) Bukkit.getWorld(worldName) else (sender as? Player)?.world
 
         if (world == null) {
@@ -44,10 +46,9 @@ class UtilWorldCommand : SporeCommand() {
 
     }
 
-    @Subcommand("world getspawn")
-    @CommandPermission(Perm.UTIL_WORLD)
-    @CommandCompletion("@worlds")
-    fun getSpawn(sender: CommandSender, @Optional @Name("world") worldName: String? = null) {
+    @Command("util world getspawn <world>")
+    @Permission(Perm.UTIL_WORLD)
+    fun getSpawn(sender: CommandSender, @Argument("world", suggestions = "worlds") worldName: String? = null) {
         val world = if (worldName != null) Bukkit.getWorld(worldName) else (sender as? Player)?.world
 
         if (world == null) {
@@ -69,8 +70,8 @@ class UtilWorldCommand : SporeCommand() {
             sender.sendMessage(button)
         }
     }
-
-    @Subcommand("world setspawn")
+/*
+    @Subcommand("util world setspawn")
     @CommandPermission(Perm.UTIL_WORLD)
     @CommandCompletion("@nothing @nothing @nothing @worlds")
     fun setSpawn(
@@ -91,7 +92,8 @@ class UtilWorldCommand : SporeCommand() {
         sender.sendSuccessMessage("Set spawn of ${world.name} to x=$x y=$y z=$z")
     }
 
-    @Subcommand("world weather")
+
+    @Command("util world weather")
     @CommandPermission(Perm.UTIL_WORLD)
     @CommandCompletion("@worlds")
     fun setWeather(
@@ -120,6 +122,7 @@ class UtilWorldCommand : SporeCommand() {
         }
         sender.sendSuccessMessage("Set weather in ${world.name} to $weatherType")
     }
+
 
     @Subcommand("world time")
     @CommandPermission(Perm.UTIL_WORLD)
@@ -166,8 +169,10 @@ class UtilWorldCommand : SporeCommand() {
         sender.sendSuccessMessage("Set ${world.name} to night")
     }
 
-    @Subcommand("world list")
-    @CommandPermission(Perm.UTIL_WORLD)
+ */
+
+    @Command("util world list")
+    @Permission(Perm.UTIL_WORLD)
     fun listWorlds(sender: CommandSender) {
         val worlds = Bukkit.getWorlds()
 
@@ -178,10 +183,9 @@ class UtilWorldCommand : SporeCommand() {
 
     }
 
-    @Subcommand("world info")
-    @CommandPermission(Perm.UTIL_WORLD)
-    @CommandCompletion("@worlds")
-    fun worldInfo(sender: CommandSender, @Optional @Name("world") worldName: String? = null) {
+    @Command("util world info <world>")
+    @Permission(Perm.UTIL_WORLD)
+    fun worldInfo(sender: CommandSender, @Argument("world", suggestions = "worlds") worldName: String? = null) {
         val world = if (worldName != null) Bukkit.getWorld(worldName) else (sender as? Player)?.world
 
         if (world == null) {

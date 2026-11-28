@@ -7,6 +7,7 @@ import me.clearedSpore.sporeCore.SporeCore
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.config
 import me.clearedSpore.sporeCore.features.discord.command.DiscordLinkCommand
+import me.clearedSpore.sporeCore.features.discord.command.ProfileCommand
 import me.clearedSpore.sporeCore.features.discord.`object`.DiscordCommand
 import me.clearedSpore.sporeCore.features.discord.`object`.DiscordLinks
 import me.clearedSpore.sporeCore.features.punishment.`object`.PunishmentType
@@ -16,15 +17,18 @@ import me.clearedSpore.sporeCore.util.Perm
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus
+import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
+import org.bukkit.util.permissions.DefaultPermissions
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
@@ -72,8 +76,8 @@ object DiscordService : ListenerAdapter() {
                         OptionType.STRING,
                         opt.name,
                         opt.description,
-                        opt.required
-                    )
+                        opt.required,
+                    ).defaultPermissions = DefaultMemberPermissions.enabledFor(opt.permission)
                 }
                 slash
             }
@@ -142,6 +146,7 @@ object DiscordService : ListenerAdapter() {
 
     fun registerCommands() {
         register(DiscordLinkCommand())
+        register(ProfileCommand())
     }
 
     fun register(command: DiscordCommand) {
@@ -165,6 +170,10 @@ object DiscordService : ListenerAdapter() {
         val config = SporeCore.instance.coreConfig.discord
         if (event.author.isBot || !event.isFromGuild) return
         if (config.chatID.isNotEmpty() && event.channel.id != config.chatID) {
+            if (
+                SporeCore.instance.coreConfig.features.channels &&
+                event.channel.id != ChatChannelService.getChannels().first().discordID
+            ) return
             val channel = ChatChannelService.getChannels().first { it.discordID == event.channel.id }
             val link = requireLink(event) ?: return
             val channelMessage = channel.message
@@ -174,7 +183,7 @@ object DiscordService : ListenerAdapter() {
             val message = event.message.contentRaw.replace(Regex("[§&][0-9aA-fk-or]"), "").trim()
 
             var format = channelMessage
-                .replace("%servername%", "&7(${serverName}&7)")
+                .replace("%server_name%", "&7${serverName}&7")
                 .replace("%rankprefix%", "")
                 .replace("%ranksuffix%", "")
                 .replace("%player_name%", link.name)

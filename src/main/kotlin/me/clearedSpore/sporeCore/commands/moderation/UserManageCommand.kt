@@ -8,6 +8,7 @@ import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Subcommand
 import co.aikar.commands.annotation.Syntax
 import me.clearedSpore.sporeAPI.util.CC.blue
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeAPI.util.log
@@ -18,20 +19,19 @@ import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Permission
 import kotlin.collections.contains
 
-@CommandAlias("usermanage")
-@CommandPermission("*")
 class UserManageCommand : SporeCommand() {
 
 
-    @Subcommand("bypassipbans")
-    @CommandCompletion("@players")
-    @Syntax("<player>")
-    fun onClear(sender: CommandSender, targetName: String) {
-        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.translate() ?: "" else ""
+    @Subcommand("usermanage bypassipbans <player>")
+    @Permission("*")
+    fun onSetIPBypass(sender: CommandSender, @Argument("player", suggestions = "players") targetName: String) {
+        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.legacyToMiniMessage() ?: "" else ""
         var target = Bukkit.getOfflinePlayer(targetName)
-        var targetSuffix = if (Bukkit.getOnlinePlayers().contains(target.player)) chatService?.getPlayerSuffix(target.player)?.translate() ?: "" else ""
+        var targetSuffix = if (Bukkit.getOnlinePlayers().contains(target.player)) chatService?.getPlayerSuffix(target.player)?.legacyToMiniMessage() ?: "" else ""
         var user = UserManager.getOrCreate(target.uniqueId, targetName)
 
         if (user.isIPBanExempt) {

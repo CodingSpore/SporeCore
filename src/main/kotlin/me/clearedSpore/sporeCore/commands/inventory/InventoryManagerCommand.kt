@@ -12,15 +12,18 @@ import me.clearedSpore.sporeCore.user.UserManager
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
 @CommandAlias("inventorymanager|invmanager|invm")
 @CommandPermission(Perm.ADMIN)
 @RegisterCommand
 class InventoryManagerCommand : SporeCommand() {
 
-    @Subcommand("remove")
-    @CommandPermission(Perm.INV_DELETE)
-    fun onRemove(sender: CommandSender, targetName: String, id: String) {
+    @Command("invmanager remove <player> <id>")
+    @Permission(Perm.INV_DELETE)
+    fun onRemove(sender: CommandSender, @Argument("player", suggestions = "players") targetName: String, @Argument("id") id: String) {
         val target = Bukkit.getOfflinePlayer(targetName)
         val uuid = target.uniqueId
         val user = UserManager.get(uuid)
@@ -41,10 +44,9 @@ class InventoryManagerCommand : SporeCommand() {
         }
     }
 
-    @Subcommand("clearall player")
-    @CommandCompletion("@players")
-    @CommandPermission(Perm.INV_ADMIN)
-    fun onClear(sender: CommandSender, targetName: String) {
+    @Command("invmanager clearall player <player>")
+    @Permission(Perm.INV_ADMIN)
+    fun onClear(sender: CommandSender, @Argument("player", suggestions = "players") targetName: String) {
         val target = Bukkit.getOfflinePlayer(targetName)
 
         val inventories = InventoryManager.getInventoriesOf(target)
@@ -69,9 +71,9 @@ class InventoryManagerCommand : SporeCommand() {
         sender.sendMessage("Took $total ms to clear $removed inventories!".blue())
     }
 
-    @Subcommand("clearall all")
+    @Command("invmanager clearall [confirm]")
     @CommandPermission(Perm.INV_ADMIN)
-    fun onClearAll(sender: CommandSender, @Optional confirm: String?) {
+    fun onClearAll(sender: CommandSender, @Argument("confirm") confirm: String?) {
         val inventories = InventoryManager.inventoryCollection
 
         sender.sendMessage("Finding inventories..".blue())

@@ -498,10 +498,11 @@ data class ChatChannelsConfig(
         "IN ORDER TO TYPE IN ANY CHANNEL THE PLAYER",
         "MUST HAVE THE sporecore.channel.allow PERMISSION!!",
         "Placeholders:",
-        "%player% -> Player that sends the message",
-        "%message% -> The message from the player",
+        "%player% → Player that sends the message",
+        "%message% → The message from the player",
         "%rankprefix% → Vault rank prefix of the player",
-        "%ranksuffix% → Vault rank suffix of the player"
+        "%ranksuffix% → Vault rank suffix of the player",
+        "%server_name% → Invokes the name of the server specified"
     )
     var channels: MutableMap<String, ChannelConfig> = mutableMapOf(
         "staff" to ChannelConfig(
@@ -511,7 +512,7 @@ data class ChatChannelsConfig(
             "",
             "sporecore.channel.staff",
             "&b&lStaff",
-            "&b&lStaff &7-> &9%ranksuffix%%player%&f: %message%",
+            "&b&lStaff &7-> &7(%server_name%) &9%ranksuffix%%player%&f: %message%",
             listOf("staffchat", "sc"),
             "#"
         ),
@@ -522,7 +523,7 @@ data class ChatChannelsConfig(
             "",
             "sporecore.channel.admin",
             "&c&lAdmin",
-            "&c&lAdmin &7-> &c%ranksuffix%%player%&f: %message%",
+            "&c&lAdmin &7-> &7(%server_name%) &c%ranksuffix%%player%&f: %message%",
             listOf("adminchat", "ac"),
             "@"
         )

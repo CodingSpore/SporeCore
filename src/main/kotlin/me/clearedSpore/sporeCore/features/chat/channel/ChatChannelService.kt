@@ -1,5 +1,6 @@
 package me.clearedSpore.sporeCore.features.chat.channel
 
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeCore.ChannelConfig
@@ -36,12 +37,13 @@ object ChatChannelService {
     fun sendChannelMessage(player: Player, message: String, channel: Channel) {
         val permission = channel.permission
         val channelMessage = channel.message
-        val prefix = chatService?.getPlayerPrefix(player)?.translate() ?: ""
-        var suffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
+        val prefix = chatService?.getPlayerPrefix(player)!!.legacyToMiniMessage()
+        var suffix = chatService.getPlayerSuffix(player)!!.legacyToMiniMessage()
 
         var format = channelMessage
             .replace("%rankprefix%", prefix)
             .replace("%ranksuffix%", suffix)
+            .replace("%server_name%", config.general.serverName)
             .replace("%player_name%", player.name)
             .replace("%message%", message)
 

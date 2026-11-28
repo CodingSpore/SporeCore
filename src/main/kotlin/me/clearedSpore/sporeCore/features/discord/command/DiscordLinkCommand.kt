@@ -5,14 +5,20 @@ import me.clearedSpore.sporeCore.features.discord.`object`.DiscordCommand
 import me.clearedSpore.sporeCore.features.discord.`object`.DiscordLinks
 import me.clearedSpore.sporeCore.features.discord.`object`.DiscordOption
 import me.clearedSpore.sporeCore.user.UserManager
+import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class DiscordLinkCommand : DiscordCommand(
+class DiscordLinkCommand() : DiscordCommand(
     name = "link",
     description = "Link your Minecraft account"
 ) {
     override val options = listOf(
-        DiscordOption("code", "Your linking code", true)
+        DiscordOption(
+            "code",
+            "Your linking code",
+            required = true,
+            permission = Permission.UNKNOWN
+        ),
     )
 
     override fun execute(event: SlashCommandInteractionEvent) {

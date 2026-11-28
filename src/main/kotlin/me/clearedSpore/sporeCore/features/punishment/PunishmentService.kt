@@ -5,6 +5,7 @@ import de.exlll.configlib.ConfigurationException
 import de.exlll.configlib.YamlConfigurations
 import me.clearedSpore.sporeAPI.task.Tasks
 import me.clearedSpore.sporeAPI.util.CC.blue
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Logger
@@ -278,7 +279,7 @@ object PunishmentService {
 
         logToDiscord(punishment)
         logPunishment(punishment)
-        val targetSuffix = if (Bukkit.getPlayer(targetUser.playerName) != null) chatService?.getPlayerSuffix(targetUser.player)?.translate() ?: "" else ""
+        val targetSuffix = if (Bukkit.getPlayer(targetUser.playerName) != null) chatService?.getPlayerSuffix(targetUser.player)?.legacyToMiniMessage() ?: "" else ""
         punisher.sendMessage("Successfully punished ${targetSuffix}${targetUser.playerName.blue()} for $reason.".blue())
 
         when (type) {
@@ -452,11 +453,11 @@ object PunishmentService {
         var targetSuffix = ""
 
         if (punishment.getPunisherPlayer() != null) {
-            punisherSuffix = chatService?.getPlayerSuffix(punishment.getPunisherPlayer())?.translate() ?: ""
+            punisherSuffix = chatService?.getPlayerSuffix(punishment.getPunisherPlayer())?.legacyToMiniMessage() ?: ""
         }
 
         if (Bukkit.getOnlinePlayers().contains(punishment.getUser()?.player)) {
-            targetSuffix = chatService?.getPlayerSuffix(punishment.getUser()?.player)?.translate() ?: ""
+            targetSuffix = chatService?.getPlayerSuffix(punishment.getUser()?.player)?.legacyToMiniMessage() ?: ""
         }
 
         val timeFormatted = punishment.getDurationFormatted()

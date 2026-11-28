@@ -65,7 +65,7 @@ class WarpService {
         }
     }
 
-    fun createWarp(name: String, location: Location) {
+    fun createWarp(name: String, location: Location, permission: String?) {
         val key = name.lowercase()
 
         if (warps.containsKey(key)) {
@@ -73,12 +73,12 @@ class WarpService {
             return
         }
 
-        val warp = Warp(name, location, null)
+        val warp = Warp(name, location, permission)
         warps[key] = warp
         db.warps.add(warp)
 
         DatabaseManager.saveServerData()
-        Logger.info("Created a new warp called '$name' at ${location.world?.name ?: "Unknown world"} [${location.blockX}, ${location.blockY}, ${location.blockZ}]")
+        Logger.info("Created a new warp called '$name' at ${location.world?.name ?: "Unknown world"} [${location.blockX}, ${location.blockY}, ${location.blockZ}] with permission $permission")
     }
 
     fun deleteWarp(name: String) {

@@ -13,26 +13,26 @@ import me.clearedSpore.sporeAPI.annotation.RegisterCommand
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 import java.lang.management.ManagementFactory
 import java.lang.management.RuntimeMXBean
 import java.text.DecimalFormat
 import kotlin.math.min
 
-@CommandAlias("util")
-@CommandPermission(Perm.UTIL_COMMAND)
 @RegisterCommand
 class UtilServerCommand : SporeCommand() {
 
-    @Subcommand("server players")
-    @CommandPermission(Perm.UTIL_SERVER)
+    @Command("util server players")
+    @Permission(Perm.UTIL_SERVER)
     fun players(sender: CommandSender) {
         val online = Bukkit.getOnlinePlayers().size
         val max = Bukkit.getMaxPlayers()
         sender.sendSuccessMessage("Online players: &f$online&7/&f$max")
     }
 
-    @Subcommand("server memory")
-    @CommandPermission(Perm.UTIL_SERVER)
+    @Command("util server memory")
+    @Permission(Perm.UTIL_SERVER)
     fun memory(sender: CommandSender) {
         val runtime = Runtime.getRuntime()
         val used = (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024
@@ -47,8 +47,8 @@ class UtilServerCommand : SporeCommand() {
 
     }
 
-    @Subcommand("server tps")
-    @CommandPermission(Perm.UTIL_SERVER)
+    @Command("util server tps")
+    @Permission(Perm.UTIL_SERVER)
     fun tps(sender: CommandSender) {
 
         val tps = try {
@@ -66,8 +66,8 @@ class UtilServerCommand : SporeCommand() {
         return kotlin.math.round(value * 10.0) / 10.0
     }
 
-    @Subcommand("server version")
-    @CommandPermission(Perm.UTIL_SERVER)
+    @Command("util server version")
+    @Permission(Perm.UTIL_SERVER)
     fun version(sender: CommandSender) {
         sender.sendSuccessMessage(
             "Server version: ".white() + Bukkit.getVersion().blue() +
@@ -77,8 +77,8 @@ class UtilServerCommand : SporeCommand() {
 
     }
 
-    @Subcommand("server uptime")
-    @CommandPermission(Perm.UTIL_SERVER)
+    @Command("util server uptime")
+    @Permission(Perm.UTIL_SERVER)
     fun uptime(sender: CommandSender) {
         val runtime: RuntimeMXBean = ManagementFactory.getRuntimeMXBean()
         val uptimeMillis = runtime.uptime

@@ -3,6 +3,7 @@ package me.clearedSpore.sporeCore.commands.moderation
 import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Message
@@ -58,7 +59,7 @@ class UnBanCommand : SporeCommand() {
         var format = ""
 
         if (sender is Player) {
-            var suffix = chatService?.getPlayerSuffix(sender)?.translate() ?: ""
+            var suffix = chatService?.getPlayerSuffix(sender)?.legacyToMiniMessage() ?: ""
 
             format = PunishmentService.config.logs.unBan
                 .replace("%ranksuffix%", suffix)

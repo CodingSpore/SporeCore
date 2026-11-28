@@ -6,58 +6,70 @@ import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.annotation.RegisterCommand
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
+import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
+import me.clearedSpore.sporeCore.features.eco.EconomyService.parseAmount
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.checkerframework.checker.units.qual.m
+import org.incendo.cloud.annotation.specifier.Range
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.bukkit.data.MultiplePlayerSelector
 
 @CommandAlias("i|item|give")
 @CommandPermission(Perm.GIVE)
 @RegisterCommand
 class ItemCommand : SporeCommand() {
 
-    @Default
-    @CommandCompletion("@materials @players|* @range:1-64 @enchantsWithLevels")
-    @Syntax("<material> [player|*] [amount] [enchant(s)|level(s)] [name]")
-    fun onGive(sender: Player, vararg args: String) {
-        if (args.isEmpty()) {
-            sender.sendMessage("Usage: /i <material> [player|*] [amount] [enchant(s)|level(s)] [name]".red())
-            return
-        }
+    @Command("i <material> <amount> [players]")
+        fun onGive(
+        sender: Player,
+        @Argument("material", suggestions = "materials") material: Material,
+        @Argument("amount") @Range(min = "1", max = "64") @org.incendo.cloud.annotations.Default("64") amount: Int?,
+        @Argument("players", suggestions = "players") players: MultiplePlayerSelector?) {
 
-        var index = 0
-        val materialName = args[index++]
-        val material = Material.matchMaterial(materialName.uppercase())
+        val material = Material.matchMaterial(material.toString())
         if (material == null) {
-            sender.sendMessage("Invalid material: $materialName".red())
+            sender.sendMessage("Invalid material: $material".red())
             return
         }
 
-        var targets: List<Player> = listOf(sender)
-        if (index < args.size) {
-            val possibleTarget = args[index]
-            if (possibleTarget == "*") {
-                targets = sender.server.onlinePlayers.toList()
-                index++
+        val amount = amount ?: 64
+
+        if (players == null) {
+            sender.inventory.addItem(ItemStack(material, amount))
+            sender.sendMessage("You received ${amount}x of ${material.name}!".blue())
+            return
+        }
+
+        val players = players.values()
+
+        if (players.isEmpty()) {
+            sender.sendErrorMessage("No players matched that selector.")
+            return
+        }
+
+        players.forEach { player ->
+            if (players.first() != sender) {
+                var suffix = chatService?.getPlayerSuffix(player)?.legacyToMiniMessage() ?: ""
+                sender.sendMessage("Gave ${amount}x ${material.name} to $suffix${player.name}".blue() + "!".blue())
+                sender.inventory.addItem(ItemStack(material, amount))
+                player.sendMessage("You received ${amount}x of ${material.name}!".blue())
+                return
             } else {
-                val player = sender.server.getPlayer(possibleTarget)
-                if (player != null) {
-                    targets = listOf(player)
-                    index++
-                }
+                sender.sendMessage("Gave ${amount}x ${material.name} to all players!".blue())
+                player.inventory.addItem(ItemStack(material, amount))
+                player.sendMessage("You received ${amount}x of ${material.name}!".blue())
+                return
             }
         }
 
-        var amount = 64
-        if (index < args.size) {
-            args[index].toIntOrNull()?.let {
-                amount = it.coerceAtMost(64)
-                index++
-            }
-        }
-
+/*
         val enchants: MutableMap<Enchantment, Int> = mutableMapOf()
         if (index < args.size && (args[index].contains("|") || args[index].contains(","))) {
             val enchParts = args[index].split(",")
@@ -86,15 +98,7 @@ class ItemCommand : SporeCommand() {
         displayName?.let { meta.setDisplayName(it) }
         enchants.forEach { (ench, level) -> meta.addEnchant(ench, level, true) }
         item.itemMeta = meta
-
-        for (target in targets) {
-            target.inventory.addItem(item.clone())
-            if (target != sender) {
-                var suffix = chatService?.getPlayerSuffix(target.player)?.translate() ?: ""
-                sender.sendMessage("Gave ${item.amount}x ${material.name} to $suffix${target.name}".blue() + "!".blue())
-            }
-            target.sendMessage("You received ${item.amount}x ${material.name}!".blue())
-        }
+        */
     }
 
 }

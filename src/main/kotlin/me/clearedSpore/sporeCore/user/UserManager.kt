@@ -7,6 +7,7 @@ import me.clearedSpore.sporeCore.features.currency.`object`.CreditAction
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
+import org.dizitart.no2.collection.NitriteCollection
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
@@ -172,6 +173,22 @@ object UserManager {
             users[user.uuid]?.let { save(it) }
         }, 10, 10, TimeUnit.MINUTES)
         autoSaveTasks[user.uuid] = task
+    }
+
+    fun pruneAllPlaytimeHistory(collection: NitriteCollection) {
+        var trimmed = 0
+        collection.find().toList().forEach { doc ->
+            val uuid = doc.get("uuidStr")?.toString()
+                ?.let { runCatching { UUID.fromString(it) }.getOrNull() } ?: return@forEach
+            val user = User.load(uuid, collection) ?: return@forEach
+            val before = user.playtimeHistory.size
+            user.pruneHistory()
+            if (user.playtimeHistory.size != before) {
+                user.save(collection, silent = true)
+                trimmed++
+            }
+        }
+        Logger.info("Pruned playtime history for $trimmed users")
     }
 
     fun stopAutoSave(uuid: UUID) {

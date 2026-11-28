@@ -20,6 +20,9 @@ import me.clearedSpore.sporeCore.menu.investigation.manage.ManageIGMenu
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.entity.Player
 import org.dizitart.no2.filters.FluentFilter.where
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
 
 @CommandAlias("investigation")
@@ -28,17 +31,18 @@ class InvestigationCommand : SporeCommand() {
 
     val service = IGService
 
-    @Default
+    @Command("investigation")
+    @Permission(Perm.INVESTIGATION_STAFF)
     fun onMenu(sender: Player) {
         InvestigationListMenu(sender).open(sender)
     }
 
-    @Subcommand("start")
-    @CommandPermission(Perm.INVESTIGATION_ADMIN)
+    @Command("investigation start <name> <priority>")
+    @Permission(Perm.INVESTIGATION_ADMIN)
     fun onStart(
         player: Player,
-        @Name("name") name: String,
-        @Name("priority") priority: InvestigationPriority,
+        @Argument("name") name: String,
+        @Argument("priority") priority: InvestigationPriority,
     ) {
 
         if (igCollection.find(where("name").eq(name)).firstOrNull() != null) {
@@ -54,24 +58,27 @@ class InvestigationCommand : SporeCommand() {
     }
 
     @Private
-    @Subcommand("add punishment")
-    fun onAddPunishment(sender: Player, investigationID: String, id: String) {
+    @Command("investigation add punishment <ID> <punishmentID>")
+    @Permission(Perm.INVESTIGATION_ADMIN)
+    fun onAddPunishment(sender: Player, @Argument("ID") investigationID: String, @Argument("punishmentID") id: String) {
         IGService.addPunishment(sender, investigationID, id).let {
             sender.sendSuccessMessage("Added the investigation punishment")
         }
     }
 
     @Private
-    @Subcommand("add report")
-    fun onAddReport(sender: Player, investigationID: String, id: String) {
+    @Command("investigation add report <ID> <reportID>")
+    @Permission(Perm.INVESTIGATION_ADMIN)
+    fun onAddReport(sender: Player, @Argument("ID") investigationID: String, @Argument("reportID") id: String) {
         IGService.addReport(investigationID, sender.uuidStr(), id).let {
             sender.sendSuccessMessage("Added the investigation report")
         }
     }
 
     @Private
-    @Subcommand("add note")
-    fun onAddNote(sender: Player, investigationID: String, name: String) {
+    @Command("investigation add note <ID> <text>")
+    @Permission(Perm.INVESTIGATION_ADMIN)
+    fun onAddNote(sender: Player, @Argument("ID") investigationID: String, @Argument("text") name: String) {
         ChatInputService.begin(sender) { input ->
             IGService.addNote(investigationID, name, input, sender).let {
                 sender.sendSuccessMessage("Added the investigation note")
@@ -80,8 +87,9 @@ class InvestigationCommand : SporeCommand() {
     }
 
     @Private
-    @Subcommand("add suspect")
-    fun onAddSuspect(sender: Player, investigationID: String, name: String) {
+    @Command("investigation add suspect <ID> <suspect>")
+    @Permission(Perm.INVESTIGATION_ADMIN)
+    fun onAddSuspect(sender: Player, @Argument("ID") investigationID: String, @Argument("suspect", suggestions = "players") name: String) {
         ChatInputService.begin(sender) { input ->
             IGService.addSuspect(investigationID, name, input, sender.name).let {
                 sender.sendSuccessMessage("Added the suspect successfully")

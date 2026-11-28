@@ -12,6 +12,7 @@ import me.clearedSpore.sporeAPI.task.Tasks
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.gray
 import me.clearedSpore.sporeAPI.util.CC.green
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.CC.white
@@ -52,29 +53,33 @@ import me.clearedSpore.sporeCore.util.button.TextButton
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 import java.io.File
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import kotlin.random.Random
 
-@CommandAlias("sporecore|core")
 @RegisterCommand
 class CoreCommand : SporeCommand() {
 
     private val startTime = System.currentTimeMillis()
 
-    @Default()
+    @Command("core help")
+    @Command("sporecore help")
     fun onHelp(help: CommandHelp) {
         help.showHelp()
     }
 
-    @Subcommand("reload")
-    @CommandPermission(Perm.ADMIN)
+    @Command("core reload")
+    @Command("sporecore reload")
+    @Permission(Perm.ADMIN)
     fun onReload(sender: CommandSender) {
         val plugin = SporeCore.instance
         val config = plugin.coreConfig
         sender.sendMessage("Reloading SporeCore asynchronously...".blue())
-        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.translate() ?: "" else ""
+        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.legacyToMiniMessage() ?: "" else ""
 
         val startTime = System.currentTimeMillis()
         Logger.initialize(config.general.prefix)
@@ -186,8 +191,9 @@ class CoreCommand : SporeCommand() {
         }
     }
 
-    @Subcommand("checkupdate")
-    @CommandPermission(Perm.UPDATECHEKER)
+    @Command("core checkupdate")
+    @Command("sporecore checkupdate")
+    @Permission(Perm.UPDATECHEKER)
     fun onCheck(sender: CommandSender) {
         val plugin = SporeCore.instance
         val checker = plugin.updateChecker
@@ -204,7 +210,8 @@ class CoreCommand : SporeCommand() {
         }
     }
 
-    @Subcommand("version")
+    @Command("core version")
+    @Command("sporecore version")
     fun onVersion(sender: CommandSender) {
         val desc = SporeCore.instance.description
         val formattedVersion = when (version) {
@@ -216,7 +223,8 @@ class CoreCommand : SporeCommand() {
         sender.sendMessage("Author(s): ".white() + desc.authors.joinToString(", ").blue())
     }
 
-    @Subcommand("info")
+    @Command("core info")
+    @Command("sporecore info")
     fun onInfo(sender: CommandSender) {
         val uptime = System.currentTimeMillis() - startTime
         val uptimeFormatted = formatDuration(uptime)
@@ -235,11 +243,14 @@ class CoreCommand : SporeCommand() {
     }
 
 
-    @Subcommand("user get")
-    @CommandPermission(Perm.ADMIN)
-    @Syntax("<player> <field>")
-    @CommandCompletion("@players @nothing")
-    fun onUserGet(sender: CommandSender, playerName: String, fieldName: String) {
+    @Command("core user <player> get <field>")
+    @Command("sporecore user <player> get <field>")
+    @Permission(Perm.ADMIN)
+    fun onUserGet(
+        sender: CommandSender,
+        @Argument("player", suggestions = "players") playerName: String,
+        @Argument("field") fieldName: String
+    ) {
         val target = Bukkit.getOfflinePlayer(playerName)
 
         if (!target.hasPlayedBefore() && !target.isOnline) {
@@ -263,14 +274,18 @@ class CoreCommand : SporeCommand() {
         sender.sendMessage("Value of '$fieldName' for ${target.name}: ".blue() + value.toString().noTranslate())
     }
 
-    @Subcommand("staffrollback")
-    @CommandPermission("*")
-    @Syntax("<staff> <time>")
-    @CommandCompletion("@players @times")
-    fun onStaffRollback(sender: CommandSender, staffName: String, timeArg: String, @Optional confirm: String?) {
+    @Command("core staffrollback <player> <time> [confirm]")
+    @Command("sporecore staffrollback <player> <time> [confirm]")
+    @Permission("*")
+    fun onStaffRollback(
+        sender: CommandSender,
+        @Argument("player", suggestions = "players") staffName: String,
+        @Argument("time", suggestions = "time") timeArg: String,
+        @Argument("confirm") confirm: String?
+    ) {
         val start = System.currentTimeMillis()
         sender.sendMessage("Processing...".blue())
-        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.translate() ?: "" else ""
+        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.legacyToMiniMessage() ?: "" else ""
 
         Tasks.runAsync {
             val staffPlayer = Bukkit.getOfflinePlayers()
@@ -413,8 +428,9 @@ class CoreCommand : SporeCommand() {
     }
 
 
-    @Subcommand("dumpdb")
-    @CommandPermission(Perm.ADMIN)
+    @Command("core dumpdb")
+    @Command("sporecore dumpdb")
+    @Permission(Perm.ADMIN)
     fun onDumpDB(sender: CommandSender) {
         sender.sendMessage("Dumping database to JSON...".blue())
 
@@ -479,10 +495,9 @@ class CoreCommand : SporeCommand() {
         }
     }
 
-    @Subcommand("wiki")
-    @CommandPermission("sporecore.wiki")
-    @CommandCompletion("currency|punishments|channels|modes|inventory|discord|selector|reports|investigation")
-    fun onWiki(sender: CommandSender, @Optional @Name("feature") feature: String?) {
+    @Command("sporecore wiki [feature]")
+    @Permission("sporecore.wiki")
+    fun onWiki(sender: CommandSender, @Argument("feature", suggestions = "features") feature: String?) {
 
         val base = "https://spore-plugins.gitbook.io/sporecore/"
 
@@ -514,9 +529,10 @@ class CoreCommand : SporeCommand() {
         sender.sendMessage("Wiki for &e$key&7: &f$url".blue())
     }
 
-    @Subcommand("simulate-lag")
-    @CommandPermission("*")
-    fun simulatelag(sender: CommandSender, ms: Long) {
+    @Command("core simulate-lag <milliseconds>")
+    @Command("sporecore simulate-lag <milliseconds>")
+    @Permission("*")
+    fun simulatelag(sender: CommandSender, @Argument("milliseconds") ms: Long) {
         sender.sendMessage("Server will now lag for " + ms + " milliseconds!".blue())
 
         try {
@@ -526,10 +542,9 @@ class CoreCommand : SporeCommand() {
         }
     }
 
-    @Subcommand("generateusers")
-    @CommandPermission("*")
-    @Private
-    fun onGenerate(sender: CommandSender, amountArg: Int?) {
+    @Command("sporecore generateusers <amount>")
+    @Permission("*")
+    fun onGenerate(sender: CommandSender, @Argument("amount") amountArg: Int?) {
 
         if (sender is Player) {
             sender.sendMessage("You can only run this command trough console!".red())
@@ -619,11 +634,14 @@ class CoreCommand : SporeCommand() {
     }
 
 
-    @Subcommand("user set")
-    @CommandPermission(Perm.ADMIN)
-    @Syntax("<player> <field> <value>")
-    @CommandCompletion("@players @nothing")
-    fun onUserSet(sender: CommandSender, playerName: String, fieldName: String, value: String) {
+    @Command("sporecore user <player> set <field> <value>")
+    @Permission(Perm.ADMIN)
+    fun onUserSet(
+        sender: CommandSender,
+        @Argument("player", suggestions = "players") playerName: String,
+        @Argument("field") fieldName: String,
+        @Argument("value") value: String
+    ) {
         val target = Bukkit.getOfflinePlayer(playerName)
 
         if (!target.hasPlayedBefore() && !target.isOnline) {
@@ -661,19 +679,17 @@ class CoreCommand : SporeCommand() {
         }
     }
 
-    @Subcommand("callback")
-    @Syntax("<id>")
-    @Private
-    fun onCallback(sender: CommandSender, id: String) {
+    @Command("sproecore callback <id>")
+    @Command("core callback <id>")
+    private fun onCallback(sender: CommandSender, @Argument("id") id: String) {
         CallbackRegistry.execute(sender, id)
     }
 
 
-    @Subcommand("user info")
-    @CommandPermission(Perm.ADMIN)
-    @Syntax("<player>")
-    @CommandCompletion("@players")
-    fun onUserInfo(sender: CommandSender, playerName: String) {
+    @Command("sporecore user info <player>")
+    @Command("core user info <player>")
+    @Permission(Perm.ADMIN)
+    fun onUserInfo(sender: CommandSender, @Argument("player", suggestions = "players") playerName: String) {
         val target = Bukkit.getOfflinePlayer(playerName)
         val user = UserManager.get(target.uniqueId)
 

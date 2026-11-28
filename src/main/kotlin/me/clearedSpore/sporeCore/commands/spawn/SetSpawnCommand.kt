@@ -8,14 +8,13 @@ import me.clearedSpore.sporeAPI.util.Message.sendSuccessMessage
 import me.clearedSpore.sporeCore.DatabaseManager
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
+class SetSpawnCommand : SporeCommand() {
 
-@CommandAlias("setspawn")
-@CommandPermission(Perm.SETSPAWN)
-class SetSpawnCommand() : SporeCommand() {
-
-
-    @Default()
+    @Command("setspawn")
+    @Permission(Perm.SETSPAWN)
     fun onSetSpawn(player: Player) {
         val serverData = DatabaseManager.getServerData()
         serverData.spawn = player.location.clone()

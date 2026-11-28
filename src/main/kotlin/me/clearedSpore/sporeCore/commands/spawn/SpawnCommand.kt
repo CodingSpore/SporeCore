@@ -7,13 +7,11 @@ import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeCore.DatabaseManager
 import me.clearedSpore.sporeCore.util.TeleportService.awaitTeleport
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Command
 
-
-@CommandAlias("spawn|gotospawn")
 class SpawnCommand : SporeCommand() {
 
-
-    @Default
+    @Command("spawn")
     fun onSpawn(player: Player) {
         val spawn = DatabaseManager.getServerData().spawn
 

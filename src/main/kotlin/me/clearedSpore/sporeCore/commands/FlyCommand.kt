@@ -7,31 +7,37 @@ import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeCore.acf.targets.`object`.TargetPlayers
 import me.clearedSpore.sporeAPI.annotation.RegisterCommand
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
+import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
+import org.incendo.cloud.bukkit.data.MultiplePlayerSelector
 
-@CommandAlias("fly|togglefly")
-@CommandPermission(Perm.FLIGHT)
 @RegisterCommand
 class FlyCommand : SporeCommand() {
 
-    @Default
-    @CommandCompletion("@targets")
-    fun onFly(sender: CommandSender, @Optional targets: TargetPlayers?) {
+    @Command("fly [targets]")
+    @Command("togglefly [targets]")
+    @Permission(Perm.FLIGHT)
+    fun onFly(sender: CommandSender, @Argument("targets", suggestions = "players") targets: MultiplePlayerSelector?) {
 
-        val resolved = targets ?: when (sender) {
-            is Player -> listOf(sender)
-            else -> throw InvalidCommandArgument("You must specify a player.")
+        if (targets == null) {
+            check(sender is Player) { "You must specify a target." }
+            sender.allowFlight = !sender.allowFlight
+            sender.sendMessage("Your flight has been ${if (sender.allowFlight) "enabled" else "disabled"}.".blue())
+            return
         }
 
-        val players = resolved.filter {
-            sender == it || sender.hasPermission(Perm.FLIGHT_OTHERS)
-        }
+        val players = targets.values()
 
         if (players.isEmpty()) {
-            throw InvalidCommandArgument("No valid players.")
+            sender.sendErrorMessage("No players matched that selector.")
+            return
         }
 
         players.forEach {
@@ -41,7 +47,7 @@ class FlyCommand : SporeCommand() {
             )
         }
 
-        var suffix = chatService?.getPlayerSuffix(players.first().player)?.translate() ?: ""
+        val suffix = chatService?.getPlayerSuffix(players.first().player)?.legacyToMiniMessage() ?: ""
 
         sender.sendMessage(
             if (players.size == 1 && players.first().name != sender.name)

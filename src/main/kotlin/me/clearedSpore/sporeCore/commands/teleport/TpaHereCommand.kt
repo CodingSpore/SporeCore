@@ -6,13 +6,13 @@ import co.aikar.commands.annotation.CommandCompletion
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.bukkit.contexts.OnlinePlayer
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
 
-@CommandAlias("tpahere")
 class TpaHereCommand : SporeCommand() {
 
-    @Default
-    @CommandCompletion("@players")
-    fun onTpaHere(sender: Player, target: OnlinePlayer) {
+    @Command("tpahere <player>")
+    fun onTpaHere(sender: Player, @Argument("player", suggestions = "players") target: OnlinePlayer) {
         TeleportRequestService.sendRequest(sender, target.player, TeleportRequestService.RequestType.TPAHERE)
     }
 }

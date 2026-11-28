@@ -6,6 +6,7 @@ import co.aikar.commands.annotation.CommandCompletion
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Syntax
 import me.clearedSpore.sporeAPI.util.CC.blue
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Cooldown
@@ -25,19 +26,22 @@ import me.clearedSpore.sporeCore.util.Util.noTranslate
 import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
 
 
 @CommandAlias("whisper|pm|msg|tell")
 class PrivateMessageCommand : SporeCommand() {
 
-    @Default
-    @CommandCompletion("@players")
-    @Syntax("<player> <message>")
-    fun onMessage(player: Player, targetName: String, messageParts: String) {
-        var suffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
+    @Command("whisper <player> <text>")
+    @Command("pm <player> <text>")
+    @Command("msg <player> <text>")
+    @Command("tell <player> <text>")
+    fun onMessage(player: Player, @Argument("player", suggestions = "players") targetName: String, @Argument("text") messageParts: String) {
+        var suffix = chatService?.getPlayerSuffix(player)?.legacyToMiniMessage() ?: ""
         val message: String = messageParts.joinWithSpaces()
         val target = Bukkit.getPlayer(targetName)
-        var targetSuffix = chatService?.getPlayerSuffix(target)?.translate() ?: ""
+        var targetSuffix = chatService?.getPlayerSuffix(target)?.legacyToMiniMessage() ?: ""
 
         if (Cooldown.isOnCooldown("msg_cooldown", player.uniqueId)) {
             player.sendErrorMessage("Please wait before doing that again")

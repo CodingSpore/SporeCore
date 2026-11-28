@@ -16,17 +16,17 @@ import me.clearedSpore.sporeCore.user.UserManager
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 import kotlin.reflect.typeOf
 
-@CommandAlias("whois")
-@CommandPermission(Perm.WHOIS)
 @RegisterCommand
 class WhoisCommand : SporeCommand() {
 
-    @Default()
-    @CommandCompletion("@players")
-    @Syntax("<player>")
-    fun onWhois(sender: CommandSender, targetName: String) {
+    @Command("whois <player>")
+    @Permission(Perm.WHOIS)
+    fun onWhois(sender: CommandSender, @Argument("player", suggestions = "players") targetName: String) {
         val target = Bukkit.getOfflinePlayer(targetName)
         val user = UserManager.get(target)
 

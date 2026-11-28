@@ -10,16 +10,17 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
-@CommandAlias("disposal|trash")
-@CommandPermission(Perm.TRASH)
 @RegisterCommand
 class TrashCommand : SporeCommand() {
 
-    @Default()
-    @CommandCompletion("@players")
-    @Syntax("[player]")
-    fun onTrash(sender: CommandSender, @Optional targetName: String?) {
+    @Command("trash [player]")
+    @Command("disposal [player]")
+    @Permission(Perm.TRASH)
+    fun onTrash(sender: CommandSender, @Argument("player", suggestions = "players") targetName: String?) {
         val target: Player? = when {
             sender is Player && targetName == null -> sender
             targetName != null -> Bukkit.getPlayer(targetName)

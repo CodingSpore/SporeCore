@@ -13,12 +13,13 @@ import me.clearedSpore.sporeCore.features.discord.`object`.DiscordLinks
 import me.clearedSpore.sporeCore.user.UserManager
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
-@CommandAlias("unlink")
-@CommandPermission(Perm.LINK)
 class UnLinkCommand : SporeCommand() {
 
-    @Default()
+    @Command("unlink")
+    @Permission(Perm.LINK)
     fun onUnLink(player: Player) {
         val user = UserManager.get(player)
         if (user == null) {

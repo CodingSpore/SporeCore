@@ -35,7 +35,7 @@ class ReportItem(
 
     override fun createItem(): ItemStack {
         val item = ItemBuilder(Material.BOOK)
-            .setName("${report.targetSuffix}${report.targetName}")
+            .setName("${report.targetName}".blue())
             .addLoreLine("Reporter: &f${report.reporterSuffix}${report.reporterName}".blue())
             .addLoreLine("Suspect: &f${report.targetSuffix}${report.targetName}".blue())
             .addLoreLine("Reason: &f${report.reason} &7(${report.type.displayName.capitalizeFirstLetter()})".blue())
@@ -53,29 +53,29 @@ class ReportItem(
                     report.status == ReportStatus.RE_OPENED)
             && viewer.hasPermission(Perm.REPORT_ADMIN)
         ) {
-
+            item.addLoreLine("&f".translate())
             item.addLoreLine("Result: &f${report.action.displayName}".blue())
-            item.addLoreLine("Staff member: &f${report.staffSuffix}${report.staffName}".blue())
+            item.addLoreLine("Staff Member: &f${report.staffSuffix}${report.staffName}".blue())
             item.addLoreLine("Silent: &f${report.silent.toString().lowercase().capitalizeFirstLetter()}".blue())
         }
 
         item.addLoreLine("&f".translate())
 
         if (report.evidence != null) {
-            item.addUsageLine(ClickType.RIGHT, "to view evidence")
+            item.addUsageLine(ClickType.RIGHT, "view evidence")
         }
 
         if (report.status != ReportStatus.COMPLETED) {
 
-            item.addUsageLine(ClickType.LEFT, "to resolve")
+            item.addUsageLine(ClickType.LEFT, "resolve")
             if (viewer.hasPermission(Perm.HISTORY_OTHERS) && SporeCore.instance.coreConfig.features.punishments) {
                 item.addUsageLine(ClickType.MIDDLE, "view punishments history")
             }
             if (viewer.hasPermission(Perm.WHOIS)) {
-                item.addUsageLine(ClickType.SHIFT_LEFT, "to view user info")
+                item.addUsageLine(ClickType.SHIFT_LEFT, "view user info")
             }
         } else if (report.status == ReportStatus.COMPLETED && viewer.hasPermission(Perm.REPORT_ADMIN)) {
-            item.addUsageLine(ClickType.LEFT, "to re-open the report")
+            item.addUsageLine(ClickType.LEFT, "re-open the report")
         }
 
         if (IGService.isStaff(viewer)

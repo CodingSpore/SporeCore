@@ -11,6 +11,8 @@ import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeAPI.util.StringUtil.capitalizeFirstLetter
 import me.clearedSpore.sporeCore.acf.targets.`object`.TargetPlayers
 import me.clearedSpore.sporeAPI.annotation.RegisterCommand
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
+import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
 import me.clearedSpore.sporeAPI.util.log
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
 import me.clearedSpore.sporeCore.util.Perm
@@ -19,17 +21,23 @@ import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
+import org.incendo.cloud.bukkit.data.MultiplePlayerSelector
 
-@CommandAlias("gamemode|gm")
-@CommandPermission(Perm.GAMEMODE)
 @RegisterCommand
 class GamemodeCommand : SporeCommand() {
 
-    @Default
-    @Syntax("<gamemode> <player>")
-    @CommandCompletion("@gamemodes @targets")
-    fun onGamemode(sender: CommandSender, gamemode: String, @Optional targets: TargetPlayers?) {
-        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.translate() ?: "" else ""
+    @Command("gamemode <gamemode> [targets]")
+    @Command("gm <gamemode> [targets]")
+    @Permission(Perm.GAMEMODE)
+    fun onGamemode(
+        sender: CommandSender,
+        @Argument("gamemode", suggestions = "gamemodes") gamemode: String,
+        @Argument("targets", suggestions = "players") targets: MultiplePlayerSelector?
+    ) {
+        val suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.translate() ?: "" else ""
 
         val mode = try {
             GameMode.valueOf(gamemode.uppercase())
@@ -50,33 +58,52 @@ class GamemodeCommand : SporeCommand() {
             return
         }
 
-        val resolved = targets ?: when (sender) {
-            is Player -> listOf(sender)
-            else -> throw InvalidCommandArgument("You must specify a player when running this command from console.")
+        if (targets == null) {
+            check(sender is Player) { "You must specify a target." }
+            sender.gameMode = mode
+            sender.sendMessage("Your gamemode has been updated to ${mode.name.lowercase().capitalizeFirstLetter()}".blue())
+            Logger.log(
+                suffix,
+                sender,
+                Perm.LOG,
+                "changed their gamemode to ${mode.name.capitalizeFirstLetter()}",
+                false
+            )
+            return
         }
 
-        val players = resolved.filter { sender == it || sender.hasPermission(Perm.GAMEMODE_OTHERS) }
+        if (!sender.hasPermission(Perm.GAMEMODE_OTHERS)) {
+            sender.sendErrorMessage("You don't have permission to set the gamemodes of others")
+            return
+        }
+
+        val players = targets.values()
 
         if (players.isEmpty()) {
-            throw InvalidCommandArgument("No valid players.")
+            sender.sendErrorMessage("No players matched that selector.")
+            return
         }
 
 
         players.forEach { target ->
             target.gameMode = mode
-            if (sender == target) {
-                Logger.log(suffix, sender, Perm.LOG, "changed their gamemode to ${mode.name.capitalizeFirstLetter()}", false)
-            } else {
+            if (players.size == 1) {
                 val targetSuffix = if (Bukkit.getOnlinePlayers().contains(target.player)) chatService?.getPlayerSuffix(target.player)?.translate() ?: "" else ""
                 Logger.log(
                     suffix,
                     sender,
                     Perm.LOG,
-                    "changed $targetSuffix${target.name}&r’s gamemode to ${mode.name.capitalizeFirstLetter()}",
+                    "changed $targetSuffix${target.name}&r’s gamemode to ${mode.name.capitalizeFirstLetter()}.",
                     false
                 )
                 sender.sendMessage("You updated ".blue() + targetSuffix + target.name + "’s gamemode to ${mode.name.capitalizeFirstLetter()}.".blue())
+                target.player?.sendMessage("Your gamemode has been updated to ${mode.name.capitalizeFirstLetter()}.".blue())
+                return
+            } else {
+                target.player?.sendMessage("Your gamemode has been updated to ${mode.name.capitalizeFirstLetter()}.".blue())
             }
         }
+        Logger.log(suffix, sender, Perm.LOG, "changed everyone’s gamemode to ${mode.name.capitalizeFirstLetter()}.", false)
+        sender.sendMessage("You updated everyone’s gamemode to ${mode.name.capitalizeFirstLetter()}.".blue())
     }
 }

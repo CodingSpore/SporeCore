@@ -11,13 +11,13 @@ import me.clearedSpore.sporeCore.user.UserManager
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.entity.Player
 import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
-@Command("tpsbar")
-@CommandPermission(Perm.TPSBAR)
 @RegisterCommand
 class TPSBarCommand : SporeCommand() {
 
-    @Default
+    @Command("tpsbar")
+    @Permission(Perm.TPSBAR)
     fun onTpsBar(player: Player) {
         val user = UserManager.get(player)
         if (user == null) {

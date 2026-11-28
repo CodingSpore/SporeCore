@@ -23,13 +23,15 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.dizitart.no2.filters.FluentFilter.where
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
-@CommandAlias("report|reports")
 class ReportCommand : SporeCommand() {
 
-    @Default()
-    @CommandCompletion("@players")
-    fun onReport(player: Player, @Optional targetName: String?) {
+    @Command("report [player]")
+    @Command("reports [player]")
+    fun onReport(player: Player, @Argument("player", suggestions = "players") targetName: String?) {
         if (targetName == null && player.hasPermission(Perm.REPORT_STAFF)) {
             ReportListMenu(player).open(player)
         } else if(targetName != null) {
@@ -66,17 +68,17 @@ class ReportCommand : SporeCommand() {
         }
     }
 
-    @Subcommand("cleanup")
-    @CommandPermission(Perm.REPORT_ADMIN)
+    @Command("report cleanup")
+    @Command("reports cleanup")
+    @Permission(Perm.REPORT_ADMIN)
     fun onCleanup(sender: CommandSender) {
         ReportService.cleanupReports()
         sender.sendSuccessMessage("Successfully cleaned up all reports!")
     }
 
-    @Subcommand("evidence")
-    @CommandPermission(Perm.REPORT_STAFF)
-    @Private
-    fun onEvidence(sender: CommandSender, reportID: String) {
+    @Command("report evidence <id>")
+    @Permission(Perm.REPORT_STAFF)
+    fun onEvidence(sender: CommandSender, @Argument("id") reportID: String) {
         val reportDoc = ReportService.reportCollection.find(where("id").eq(reportID)).firstOrNull() ?: run {
             sender.sendErrorMessage("Failed to find report!")
             return

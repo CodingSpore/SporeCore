@@ -35,6 +35,8 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
+const val HISTORY_DAYS = 1L
+
 data class User(
     var uuidStr: String = UUID.randomUUID().toString(),
     var playerName: String = "",
@@ -342,6 +344,28 @@ data class User(
     fun logEconomy(action: EcoAction, amount: Double, reason: String = "") {
         economyLogs.add(0, EconomyLog(action, amount, reason, System.currentTimeMillis()))
         if (economyLogs.size > 100) economyLogs.removeLast()
+    }
+
+    fun pruneHistory() {
+        val cutoff = System.currentTimeMillis() - HISTORY_DAYS * 86_400_000
+        playtimeHistory.removeAll { it.second < cutoff }
+    }
+
+    fun addSession(joinTime: Long, quitTime: Long) {
+        val last = playtimeHistory.lastOrNull()
+        if (last != null && joinTime - last.second < 60_000) {
+            playtimeHistory[playtimeHistory.lastIndex] = last.first to quitTime   // quick reconnect
+        } else {
+            playtimeHistory.add(joinTime to quitTime)
+        }
+        pruneHistory()
+    }
+
+    fun weeklyPlaytime(now: Long = System.currentTimeMillis()): Long {
+        val cutoff = now - 7 * 86_400_000L
+        return playtimeHistory.sumOf { (start, end) ->
+            (end - maxOf(start, cutoff)).coerceAtLeast(0L)
+        }
     }
 
 

@@ -14,9 +14,11 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.ItemMeta
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
+import org.jetbrains.annotations.Range
 
-@CommandAlias("edititem")
-@CommandPermission(Perm.ITEM_EDITOR)
 @RegisterCommand
 class EditItemCommand : SporeCommand() {
 
@@ -32,9 +34,9 @@ class EditItemCommand : SporeCommand() {
     private fun getItem(player: Player) = player.inventory.itemInMainHand
 
 
-    @Subcommand("rename")
-    @Syntax("<name>")
-    fun onRename(player: Player, name: String) {
+    @Command("edititem rename <name>")
+    @Permission(Perm.ITEM_EDITOR)
+    fun onRename(player: Player, @Argument("name") name: String) {
         val item = getItem(player)
         val meta = getItemMeta(player) ?: return
 
@@ -44,10 +46,12 @@ class EditItemCommand : SporeCommand() {
     }
 
 
-    @Subcommand("enchant")
-    @CommandCompletion("@enchants")
-    @Syntax("<enchant> <level>")
-    fun onEnchant(player: Player, enchant: Enchantment, @Optional levelStr: Int?) {
+    @Command("edititem enchant <enchantment> <level>")
+    @Permission(Perm.ITEM_EDITOR)
+    fun onEnchant(
+        player: Player,
+        @Argument("enchantment", suggestions = "enchants") enchant: Enchantment,
+        @Argument("level") @org.incendo.cloud.annotation.specifier.Range(min = "1", max = "255") levelStr: Int?) {
         val item = getItem(player)
         val meta = getItemMeta(player) ?: return
 
@@ -59,9 +63,9 @@ class EditItemCommand : SporeCommand() {
     }
 
 
-    @Subcommand("lore add")
-    @Syntax("<text>")
-    fun onLoreAdd(player: Player, text: String) {
+    @Command("edititem lore add <text>")
+    @Permission(Perm.ITEM_EDITOR)
+    fun onLoreAdd(player: Player, @Argument("text") text: String) {
         val item = getItem(player)
         val meta = getItemMeta(player) ?: return
 
@@ -73,9 +77,9 @@ class EditItemCommand : SporeCommand() {
         player.sendSuccessMessage("Added lore line: '${text.translate()}'")
     }
 
-    @Subcommand("lore set")
-    @Syntax("<line> <text>")
-    fun onLoreSet(player: Player, line: Int, text: String) {
+    @Command("edititem lore set <line> <text>")
+    @Permission(Perm.ITEM_EDITOR)
+    fun onLoreSet(player: Player, @Argument("line") line: Int, @Argument("text") text: String) {
         val item = getItem(player)
         val meta = getItemMeta(player) ?: return
 
@@ -91,9 +95,9 @@ class EditItemCommand : SporeCommand() {
         player.sendSuccessMessage("Set lore line $line to '${text.translate()}'")
     }
 
-    @Subcommand("lore remove")
-    @Syntax("<line>")
-    fun onLoreRemove(player: Player, line: Int) {
+    @Command("edititem lore remove <line>")
+    @Permission(Perm.ITEM_EDITOR)
+    fun onLoreRemove(player: Player, @Argument("line") line: Int) {
         val item = getItem(player)
         val meta = getItemMeta(player) ?: return
 

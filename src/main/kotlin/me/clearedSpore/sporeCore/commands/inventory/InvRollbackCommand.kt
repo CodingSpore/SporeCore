@@ -12,13 +12,13 @@ import me.clearedSpore.sporeCore.user.UserManager
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
 
-@CommandAlias("invrollback|invrestore|restoreinv")
 class InvRollbackCommand : SporeCommand() {
 
-    @Default
-    @CommandCompletion("@players")
-    fun onRollback(player: Player, @Optional @Name("target") targetName: String?) {
+    @Command("invrestore [player]")
+    fun onRollback(player: Player, @Argument("player", suggestions = "players") targetName: String?) {
 
         if (targetName.isNullOrEmpty()) {
             val user = UserManager.get(player)

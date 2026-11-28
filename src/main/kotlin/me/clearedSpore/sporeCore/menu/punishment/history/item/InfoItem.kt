@@ -21,7 +21,7 @@ class InfoItem(
 ) : Item() {
 
     override fun createItem(): ItemStack {
-//        var suffix = ChatService.getSuffix(target as Player)?.translate() ?: ""
+//        var suffix = ChatService.getSuffix(target as Player)?.legacyToMiniMessage() ?: ""
         val item = PlayerUtil.getPlayerHead(target, "${target.name}"!!.blue())
         val meta = item.itemMeta
 

@@ -13,7 +13,7 @@ import org.bukkit.Statistic
 
 class StatsMenu(val player: OfflinePlayer) : Menu(SporeCore.instance) {
     override fun getMenuName(): String {
-        return "Stats |  ${player.name}"
+        return "Stats | ${player.name}"
     }
 
     override fun getRows(): Int {

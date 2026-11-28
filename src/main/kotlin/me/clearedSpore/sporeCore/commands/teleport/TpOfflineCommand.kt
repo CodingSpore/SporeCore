@@ -10,6 +10,7 @@ import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
 import me.clearedSpore.sporeCore.SporeCore
 import me.clearedSpore.sporeCore.acf.targets.`object`.TargetPlayers
 import me.clearedSpore.sporeAPI.annotation.RegisterCommand
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.Message.sendSuccessMessage
 import me.clearedSpore.sporeAPI.util.log
 import me.clearedSpore.sporeCore.extension.PlayerExtension.uuidStr
@@ -23,16 +24,23 @@ import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
 @CommandAlias("tpo|tpoffline")
 @CommandPermission(Perm.TELEPORT)
-@RegisterCommand()
+@RegisterCommand
 class TpOfflineCommand : SporeCommand() {
 
-    @Default
-    @CommandPermission(Perm.TELEPORT + ".offline")
-    fun onTpOffline(sender: CommandSender, target: OfflinePlayer) {
-        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.translate() ?: "" else ""
+    @Command("tpo <player>")
+    @Command("tpoffline <player>")
+    @Permission(Perm.TELEPORT + ".offline")
+    fun onTpOffline(
+        sender: CommandSender,
+        @Argument("player", suggestions = "players") target: OfflinePlayer
+    ) {
+        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.legacyToMiniMessage() ?: "" else ""
         val targetPlayer = Bukkit.getOfflinePlayer(target.uniqueId)
 
         val shouldLog = SporeCore.instance.coreConfig.logs.teleports

@@ -2,6 +2,7 @@ package me.clearedSpore.sporeCore.commands.teleport
 
 import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
+import co.aikar.commands.bukkit.contexts.OnlinePlayer
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Logger
@@ -9,6 +10,7 @@ import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
 import me.clearedSpore.sporeCore.SporeCore
 import me.clearedSpore.sporeCore.acf.targets.`object`.TargetPlayers
 import me.clearedSpore.sporeAPI.annotation.RegisterCommand
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.log
 import me.clearedSpore.sporeCore.extension.PlayerExtension.uuidStr
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
@@ -16,16 +18,68 @@ import me.clearedSpore.sporeCore.features.logs.LogsService
 import me.clearedSpore.sporeCore.features.logs.`object`.LogType
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Bukkit
+import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
+import org.incendo.cloud.bukkit.data.MultiplePlayerSelector
 
-@CommandAlias("tp|teleport|goto")
-@CommandPermission(Perm.TELEPORT)
-@RegisterCommand()
+@RegisterCommand
 class TeleportCommand : SporeCommand() {
 
-    @Default
+    @Command("tp <player> [target]")
+    @Command("teleport <player> [target]")
+    @Command("goto <player> [target]")
+    @Permission(Perm.TELEPORT)
+    fun onTp(
+        sender: CommandSender,
+        @Argument("player", suggestions = "players") player: Player,
+        @Argument("target", suggestions = "players") target: Player?
+    ) {
+        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.legacyToMiniMessage() ?: "" else ""
+        var target1Suffix = chatService?.getPlayerSuffix(player)?.legacyToMiniMessage() ?: ""
+        var target2Suffix = if (target != null) chatService?.getPlayerSuffix(target)?.legacyToMiniMessage() ?: "" else ""
+        val sender = sender as Player
+        val shouldLog = SporeCore.instance.coreConfig.logs.teleports
+
+        if (target?.isOnline == true) {
+            if (!sender.hasPermission(Perm.TELEPORT_OTHERS)) {
+                sender.sendErrorMessage("You don't have permission to teleport other players")
+                return
+            }
+
+            Bukkit.getPlayer(player.uniqueId)?.teleportAsync(target.location)
+            Logger.log(
+                suffix,
+                sender,
+                Perm.LOG,
+                "teleported $target1Suffix${player.name}&r to $target2Suffix${target.name}",
+                false
+            )
+            sender.sendMessage("Teleported $target1Suffix${player.name}&r to $target2Suffix${target.name}&r&cb.".blue())
+            if (shouldLog) {
+                LogsService.addLog(
+                    sender.uuidStr(),
+                    "Teleported ${player.name} to ${target.name}",
+                    LogType.TELEPORT
+                )
+            }
+            return
+        }
+
+        sender.teleportAsync(player.location)
+        Logger.log(suffix, sender, Perm.LOG, "teleported to ${target1Suffix}${player.name}", false)
+        sender.sendMessage("Teleported to $target1Suffix${player.name}&r&cb.".blue())
+        if (shouldLog) {
+            LogsService.addLog(sender.uuidStr(), "Teleported to ${player.name}", LogType.TELEPORT)
+        }
+    }
+
+    /*
+    @Command("tp <x> <y> <z>")
     @CommandCompletion("@targets|~ @targets|~ ~ ~")
     fun onTp(
         sender: CommandSender,
@@ -35,7 +89,7 @@ class TeleportCommand : SporeCommand() {
         @Optional arg4: String?,
         @Optional targets: TargetPlayers?
     ) {
-        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.translate() ?: "" else ""
+        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.legacyToMiniMessage() ?: "" else ""
         val playerSender = sender as? Player
 
         val firstTargets = targets ?: run {
@@ -51,7 +105,7 @@ class TeleportCommand : SporeCommand() {
                     return
                 }
                 val target = firstTargets.first()
-                val firstSuffix = chatService?.getPlayerSuffix(firstTargets.first())?.translate() ?: ""
+                val firstSuffix = chatService?.getPlayerSuffix(firstTargets.first())?.legacyToMiniMessage() ?: ""
                 playerSender.teleportAsync(target.location)
                 Logger.log(suffix, sender, Perm.LOG, "teleported to $firstSuffix${target.name}", false)
                 sender.sendMessage("Teleported to $firstSuffix${target.name}&r&cb.".blue())
@@ -62,8 +116,8 @@ class TeleportCommand : SporeCommand() {
 
             arg2 != null && arg3 == null -> {
                 val secondTarget = Bukkit.getPlayerExact(arg2)
-                val secondSuffix = chatService?.getPlayerSuffix(Bukkit.getPlayerExact(arg2))?.translate() ?: ""
-                val firstSuffix = chatService?.getPlayerSuffix(firstTargets.first())?.translate() ?: ""
+                val secondSuffix = chatService?.getPlayerSuffix(Bukkit.getPlayerExact(arg2))?.legacyToMiniMessage() ?: ""
+                val firstSuffix = chatService?.getPlayerSuffix(firstTargets.first())?.legacyToMiniMessage() ?: ""
                 if (secondTarget == null) {
                     sender.sendErrorMessage("The target player '${arg2}' is not online.")
                     return
@@ -148,7 +202,7 @@ class TeleportCommand : SporeCommand() {
 
                 firstTargets.forEach { target ->
                     target.teleportAsync(loc)
-                    val targetSuffixes = chatService?.getPlayerSuffix(target)?.translate() ?: ""
+                    val targetSuffixes = chatService?.getPlayerSuffix(target)?.legacyToMiniMessage() ?: ""
                     Logger.log(
                         suffix,
                         sender,
@@ -196,5 +250,5 @@ class TeleportCommand : SporeCommand() {
         } catch (e: Exception) {
             null
         }
-    }
+    }*/
 }

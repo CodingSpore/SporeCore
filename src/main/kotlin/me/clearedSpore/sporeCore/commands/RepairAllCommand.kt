@@ -7,36 +7,41 @@ import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeCore.acf.targets.`object`.TargetPlayers
 import me.clearedSpore.sporeAPI.annotation.RegisterCommand
+import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
+import org.incendo.cloud.bukkit.data.MultiplePlayerSelector
 
-@CommandAlias("repairall|fixall")
-@CommandPermission(Perm.REPAIRALL)
 @RegisterCommand
 class RepairAllCommand : SporeCommand() {
 
-    @Default
-    @CommandCompletion("@targets")
-    @Syntax("<targets>")
-    fun onRepair(sender: CommandSender, @Optional targets: TargetPlayers?) {
+    @Command("repairall [targets]")
+    @Command("fixall [targets]")
+    @Permission(Perm.REPAIRALL)
+    fun onRepair(sender: CommandSender, @Argument("targets", suggestions = "players") targets: MultiplePlayerSelector?) {
+        if (targets == null) {
+            check(sender is Player) { Logger.error("You must specify a target.") }
+            (sender.inventory.contents + sender.inventory.extraContents + arrayOf(sender.inventory.itemInOffHand)).forEach { item ->
+                if (item != null && item.type != Material.AIR) {
+                    item.durability = 0
+                }
+                sender.sendMessage("All your items have been repaired.".blue())
+            }
 
-        val resolved = targets ?: when (sender) {
-            is Player -> listOf(sender)
-            else -> throw InvalidCommandArgument("You must specify a player.")
-        }
-
-
-        if (resolved.isEmpty()) {
-            sender.sendMessage("No valid players selected.".red())
             return
         }
+
+        val players = targets.values()
 
         var success = 0
         var failed = 0
 
-        resolved.forEach { player ->
+        players.forEach { player ->
             var repaired = 0
 
             (player.inventory.contents + player.inventory.extraContents + arrayOf(player.inventory.itemInOffHand)).forEach { item ->

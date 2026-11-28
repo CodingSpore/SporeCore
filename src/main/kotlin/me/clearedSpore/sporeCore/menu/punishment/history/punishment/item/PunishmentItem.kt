@@ -3,6 +3,7 @@ package me.clearedSpore.sporeCore.menu.punishment.history.punishment.item
 import me.clearedSpore.sporeAPI.menu.item.Item
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.gray
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.ChatInputService
@@ -124,7 +125,7 @@ class PunishmentItem(
                 var format = ""
 
                 if (user is Player) {
-                    var suffix = chatService?.getPlayerSuffix(user)?.translate() ?: ""
+                    var suffix = chatService?.getPlayerSuffix(user)?.legacyToMiniMessage() ?: ""
 
                     format = logMsg
                         .replace("%ranksuffix%", suffix)

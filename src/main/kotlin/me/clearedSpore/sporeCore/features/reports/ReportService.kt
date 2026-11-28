@@ -3,6 +3,7 @@ package me.clearedSpore.sporeCore.features.reports
 import com.github.benmanes.caffeine.cache.Caffeine
 import me.clearedSpore.sporeAPI.task.SporeScheduledTask
 import me.clearedSpore.sporeAPI.task.Tasks
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Cooldown
 import me.clearedSpore.sporeAPI.util.Logger
@@ -55,10 +56,10 @@ object ReportService {
             id = UUID.randomUUID().toString(),
             targetUuid = target.uniqueId.toString(),
             targetName = target.name ?: "Unknown",
-            targetSuffix = chatService?.getPlayerSuffix(target as? Player)?.translate() ?: "",
+            targetSuffix = chatService?.getPlayerSuffix(target as? Player)?.legacyToMiniMessage() ?: "",
             reporterUuid = reporter.uniqueId.toString(),
             reporterName = reporter.name,
-            reporterSuffix = chatService?.getPlayerSuffix(reporter)?.translate() ?: "",
+            reporterSuffix = chatService?.getPlayerSuffix(reporter)?.legacyToMiniMessage() ?: "",
             reason = reason,
             evidence = evidence,
             timestamp = System.currentTimeMillis(),
@@ -153,7 +154,7 @@ object ReportService {
         report.action = action
         report.staffName = player.name
         report.staffUuid = player.uuidStr()
-        report.staffSuffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
+        report.staffSuffix = chatService?.getPlayerSuffix(player)?.legacyToMiniMessage() ?: ""
         report.silent = silent
 
         val target = Bukkit.getOfflinePlayer(UUID.fromString(report.targetUuid))
@@ -167,12 +168,10 @@ object ReportService {
                 SporeCore.instance.coreConfig.reports.reportAccepted
                     .replace("%staff%", "${report.staffSuffix}${player.name}")
                     .replace("%target%", "${report.targetSuffix}${target.name.toString()}")
-                    .translate()
             } else {
                 SporeCore.instance.coreConfig.reports.reportDenied
                     .replace("%staff%", "${report.staffSuffix}${player.name}")
                     .replace("%target%", "${report.targetSuffix}${target.name.toString()}")
-                    .translate()
             }
             Message.broadcastMessageWithPermission(
                 broadcastMsg.translate(),
@@ -197,7 +196,7 @@ object ReportService {
                     ?.sendMessage(SporeCore.instance.coreConfig.reports.notifyReporter.translate())
             } else {
                 UserManager.get(UUID.fromString(report.reporterUuid))?.run {
-                    sendMessage(SporeCore.instance.coreConfig.reports.notifyReporter)
+                    sendMessage(SporeCore.instance.coreConfig.reports.notifyReporter.translate())
                     save()
                 } ?: player.sendErrorMessage("Failed to notify reporter! Please contact an administrator")
             }
@@ -231,7 +230,7 @@ object ReportService {
             .replace("%staff%", player.name)
             .translate()
         if (reporter.isOnline) {
-            Bukkit.getPlayer(reporter.uniqueId)?.sendMessage(msg.translate())
+            Bukkit.getPlayer(reporter.uniqueId)?.sendMessage(msg)
         } else {
             UserManager.get(UUID.fromString(report.reporterUuid))?.run {
                 sendMessage(msg)

@@ -12,6 +12,7 @@ import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
 import me.clearedSpore.sporeAPI.util.Message.sendSuccessMessage
 import me.clearedSpore.sporeAPI.util.StringUtil.joinWithSpaces
 import me.clearedSpore.sporeAPI.annotation.RegisterCommand
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeCore.extension.PlayerExtension.userJoinFail
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
 import me.clearedSpore.sporeCore.features.vanish.VanishService
@@ -25,17 +26,16 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
-
-@CommandAlias("util")
-@CommandPermission(Perm.UTIL_COMMAND)
 @RegisterCommand
 class UtilPlayerCommand : SporeCommand() {
 
-    @Subcommand("player uuid")
-    @CommandPermission(Perm.UTIL_PLAYER)
-    @CommandCompletion("@players")
-    fun getUUID(sender: CommandSender, @Name("player") targetName: String) {
+    @Command("util player uuid <player>")
+    @Permission(Perm.UTIL_PLAYER)
+    fun getUUID(sender: CommandSender, @Argument("player", suggestions = "players") targetName: String) {
         val target = Bukkit.getOfflinePlayer(targetName)
 
         if (!target.hasPlayedBefore()) {
@@ -54,16 +54,15 @@ class UtilPlayerCommand : SporeCommand() {
         sender.sendMessage(button)
     }
 
-    @Subcommand("player skull")
-    @CommandPermission(Perm.UTIL_PLAYER)
-    @CommandCompletion("@players")
-    fun skull(sender: CommandSender, @Name("player") targetName: String) {
+/*    @Command("util player skull <player>")
+    @Permission(Perm.UTIL_PLAYER)
+    fun skull(sender: CommandSender, @Argument("player", suggestions = "players") targetName: String) {
         val target: OfflinePlayer = Bukkit.getOfflinePlayer(targetName)
         if (!target.hasPlayedBefore() && !target.isOnline) {
             sender.userJoinFail()
             return
         }
-        var suffix = chatService?.getPlayerSuffix(target.player)?.translate() ?: ""
+        var suffix = chatService?.getPlayerSuffix(target.player)?.legacyToMiniMessage() ?: ""
 
         val head = ItemStack(org.bukkit.Material.PLAYER_HEAD)
         val meta = head.itemMeta as SkullMeta
@@ -74,29 +73,32 @@ class UtilPlayerCommand : SporeCommand() {
         if (sender is Player) {
             sender.inventory.addItem(head)
         }
-    }
+    }*/
 
-    @Subcommand("player sendmessage")
-    @CommandPermission(Perm.UTIL_PLAYER)
-    @CommandCompletion("@players")
+    @Command("util player sendmessage <player> <message>")
+    @Permission(Perm.UTIL_PLAYER)
     fun onSendMessage(
         sender: CommandSender,
-        @Name("player") targetOnline: OnlinePlayer,
-        @Name("message") messageParts: String
+        @Argument("player", suggestions = "players") targetOnline: Player,
+        @Argument("message") messageParts: String
     ) {
-        val target = targetOnline.player
+        val target = targetOnline.player as Player
         val message = messageParts.joinWithSpaces()
-        var suffix = chatService?.getPlayerSuffix(target)?.translate() ?: ""
+        var suffix = chatService?.getPlayerSuffix(target)?.legacyToMiniMessage() ?: ""
+
+        if (!target.isOnline) {
+            sender.sendErrorMessage("That player is not online.")
+            return
+        }
 
         target.sendMessage(message.translate())
         sender.sendSuccessMessage("Successfully send the message to $suffix${target.name}")
         sender.sendMessage("Message: $message".blue())
     }
 
-    @Subcommand("player skull id")
-    @CommandPermission(Perm.UTIL_PLAYER)
-    @Syntax("<id>")
-    fun skullId(sender: CommandSender, skullId: String) {
+/*    @Command("util player skull id <id>")
+    @Permission(Perm.UTIL_PLAYER)
+    fun skullId(sender: CommandSender, @Argument("id") skullId: String) {
         val head = ItemStack(org.bukkit.Material.PLAYER_HEAD)
         val meta = head.itemMeta as SkullMeta
         meta.ownerProfile = Bukkit.getOfflinePlayer(skullId).playerProfile
@@ -107,19 +109,18 @@ class UtilPlayerCommand : SporeCommand() {
         if (sender is Player) {
             sender.inventory.addItem(head)
         }
-    }
+    }*/
 
 
-    @Subcommand("player vanished")
-    @CommandPermission(Perm.UTIL_PLAYER)
-    @CommandCompletion("@players")
-    fun vanished(sender: CommandSender, @Name("player") targetName: String) {
+    @Command("util player vanished <player> ")
+    @Permission(Perm.UTIL_PLAYER)
+    fun vanished(sender: CommandSender, @Argument("player", suggestions = "players") targetName: String) {
         val target = Bukkit.getPlayer(targetName)
         if (target == null) {
             sender.sendErrorMessage("&e$targetName".translate() + " is offline, cannot retrieve their vanish status.".red())
             return
         }
-        var suffix = chatService?.getPlayerSuffix(target)?.translate() ?: ""
+        var suffix = chatService?.getPlayerSuffix(target)?.legacyToMiniMessage() ?: ""
 
         val isVanished = VanishService.isVanished(target.uniqueId)
         if (isVanished) {
@@ -129,10 +130,9 @@ class UtilPlayerCommand : SporeCommand() {
         }
     }
 
-    @Subcommand("player location")
-    @CommandPermission(Perm.UTIL_PLAYER)
-    @CommandCompletion("@players")
-    fun location(sender: CommandSender, @Name("player") targetName: String) {
+    @Command("util player location <player>")
+    @Permission(Perm.UTIL_PLAYER)
+    fun location(sender: CommandSender, @Argument("player", suggestions = "players") targetName: String) {
         val target = Bukkit.getPlayer(targetName)
         if (target == null) {
             sender.sendErrorMessage("$targetName is offline, cannot retrieve location!")
@@ -141,7 +141,7 @@ class UtilPlayerCommand : SporeCommand() {
 
         val loc = target.location
         val copyString = "${loc.blockX}, ${loc.blockY}, ${loc.blockZ}, ${loc.world?.name ?: "world"}"
-        var suffix = chatService?.getPlayerSuffix(target)?.translate() ?: ""
+        var suffix = chatService?.getPlayerSuffix(target)?.legacyToMiniMessage() ?: ""
         sender.sendSuccessMessage("$suffix${target.name}" + "'s location: ${loc.world?.name} x:${loc.blockX} y:${loc.blockY} z:${loc.blockZ}".white())
 
         if (sender is Player) {

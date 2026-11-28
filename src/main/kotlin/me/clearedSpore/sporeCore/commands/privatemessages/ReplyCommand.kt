@@ -5,6 +5,7 @@ import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Syntax
 import me.clearedSpore.sporeAPI.util.CC.blue
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Cooldown
@@ -23,15 +24,17 @@ import me.clearedSpore.sporeCore.util.Util.noTranslate
 import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
 
 
 @CommandAlias("reply|r")
 class ReplyCommand : SporeCommand() {
 
-    @Default
-    @Syntax("<message>")
-    fun onReply(player: Player, messageParts: String) {
-        var suffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
+    @Command("reply <message>")
+    @Command("r <message>")
+    fun onReply(player: Player, @Argument("message") messageParts: String) {
+        var suffix = chatService?.getPlayerSuffix(player)?.legacyToMiniMessage() ?: ""
         val message: String = messageParts.joinWithSpaces()
         val lastSenderId = PMService.getLastSender(player)
 
@@ -46,7 +49,7 @@ class ReplyCommand : SporeCommand() {
         }
 
         val target = Bukkit.getPlayer(lastSenderId)
-        var targetSuffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
+        var targetSuffix = chatService?.getPlayerSuffix(player)?.legacyToMiniMessage() ?: ""
         if (target == null || !target.isOnline) {
             player.sendErrorMessage("Your last sender is not online.")
             return

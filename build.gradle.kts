@@ -8,10 +8,11 @@ plugins {
 }
 
 group = "me.clearedSpore"
-version = "2.8.4"
+version = "2.8.5"
 
 repositories {
     mavenCentral()
+    mavenLocal()
     maven("https://repo.aikar.co/content/groups/aikar/")
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://jitpack.io")
@@ -26,6 +27,10 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
     implementation("org.bstats:bstats-bukkit:3.1.0")
+    constraints {
+        implementation("org.incendo:cloud-bom:2.1.0")
+        implementation("org.incendo:cloud-minecraft-bom:2.0.1")
+    }
 
     //implementation(kotlin("reflect"))
     //implementation(kotlin("stdlib"))
@@ -33,14 +38,15 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.30")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
 
+
     implementation("org.yaml:snakeyaml:2.0")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT") {
         exclude(group = "com.google.code.gson")
         exclude(group = "org.yaml", module = "snakeyaml")
     }
     implementation("com.github.Exlll.ConfigLib:configlib-yaml:v4.6.1")
-    implementation("eu.sporedev:sporeapi-acf:11.0.0")
-    implementation("eu.sporedev:sporeapi-paper:11.0.0")
+    implementation("eu.sporedev:sporeapi-acf:11.0.8")
+    implementation("eu.sporedev:sporeapi-paper:11.0.8")
     implementation("xyz.xenondevs.invui:invui-kotlin:2.5.1")
     compileOnly("org.dizitart:nitrite:4.3.2")
     compileOnly(platform("org.dizitart:nitrite-bom:4.3.2"))

@@ -7,13 +7,15 @@ import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Default
 import me.clearedSpore.sporeAPI.annotation.RegisterCommand
 import me.clearedSpore.sporeCore.util.Perm
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.CommandDescription
+import org.incendo.cloud.annotations.Permission
 
-@CommandAlias("util")
-@CommandPermission(Perm.UTIL_COMMAND)
 @RegisterCommand
 class UtilCommand : SporeCommand() {
 
-    @Default
+    @Command("util")
+    @Permission(Perm.UTIL_COMMAND)
     fun onHelp(help: CommandHelp) {
         help.showHelp()
     }

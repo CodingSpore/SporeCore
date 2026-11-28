@@ -3,6 +3,7 @@ package me.clearedSpore.sporeCore.menu.investigation.manage.item
 import lombok.`val`
 import me.clearedSpore.sporeAPI.menu.item.Item
 import me.clearedSpore.sporeAPI.util.CC.blue
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.ChatInputService
 import me.clearedSpore.sporeAPI.util.IdUtil
@@ -44,7 +45,7 @@ class CompleteIGItem(
     }
 
     override fun onClickEvent(clicker: Player, clickType: ClickType) {
-        var suffix = chatService?.getPlayerSuffix(clicker)?.translate() ?: ""
+        var suffix = chatService?.getPlayerSuffix(clicker)?.legacyToMiniMessage() ?: ""
         val investigation = IGService.findInvestigation(investigationID)!!
         if (investigation.status == InvestigationStatus.COMPLETED) {
 

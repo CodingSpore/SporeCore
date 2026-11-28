@@ -5,6 +5,7 @@ import co.aikar.commands.annotation.*
 import co.aikar.commands.bukkit.contexts.OnlinePlayer
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.green
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeCore.extension.PlayerExtension.userJoinFail
@@ -38,7 +39,7 @@ class EconomyCommand : SporeCommand() {
         val displayName = target.name ?: user.playerName.ifEmpty { "Unknown" }
 
         val formatted = EconomyService.format(user.balance)
-        val suffix = if (Bukkit.getOnlinePlayers().contains(target.player)) chatService?.getPlayerSuffix(target.player)?.translate() ?: "" else ""
+        val suffix = if (Bukkit.getOnlinePlayers().contains(target.player)) chatService?.getPlayerSuffix(target.player)?.legacyToMiniMessage() ?: "" else ""
         sender.sendMessage("$suffix${displayName}&cb's Balance: ".blue() + formatted.green())
         sender.playSound(Sound.sound(
             net.kyori.adventure.key.Key.key("entity.horse.armor"),
@@ -71,7 +72,7 @@ class EconomyCommand : SporeCommand() {
 
         EconomyService.add(user, amount, "Added by ${sender.name}")
 
-        val suffix = if (Bukkit.getOnlinePlayers().contains(target.player)) chatService?.getPlayerSuffix(target.player)?.translate() ?: "" else ""
+        val suffix = if (Bukkit.getOnlinePlayers().contains(target.player)) chatService?.getPlayerSuffix(target.player)?.legacyToMiniMessage() ?: "" else ""
         sender.sendMessage("Added ".blue() + EconomyService.format(amount).green() + " to $suffix${user.playerName}&cb.".blue())
         sender.playSound(Sound.sound(
             net.kyori.adventure.key.Key.key("entity.player.levelup"),
@@ -111,7 +112,7 @@ class EconomyCommand : SporeCommand() {
 
         EconomyService.remove(user, amount, "Removed by ${sender.name}")
 
-        val suffix = if (Bukkit.getOnlinePlayers().contains(target.player)) chatService?.getPlayerSuffix(target.player)?.translate() ?: "" else ""
+        val suffix = if (Bukkit.getOnlinePlayers().contains(target.player)) chatService?.getPlayerSuffix(target.player)?.legacyToMiniMessage() ?: "" else ""
         sender.sendMessage("Removed ".blue() + EconomyService.format(amount).red() + " from $suffix${user.playerName}&cb.".blue())
         sender.playSound(Sound.sound(
             net.kyori.adventure.key.Key.key("entity.player.levelup"),
@@ -150,7 +151,7 @@ class EconomyCommand : SporeCommand() {
 
         EconomyService.set(user, amount, "Set by ${sender.name}")
 
-        val suffix = if (Bukkit.getOnlinePlayers().contains(target.player)) chatService?.getPlayerSuffix(target.player)?.translate() ?: "" else ""
+        val suffix = if (Bukkit.getOnlinePlayers().contains(target.player)) chatService?.getPlayerSuffix(target.player)?.legacyToMiniMessage() ?: "" else ""
         sender.sendMessage("Set $suffix${user.playerName}&cb's balance to ".blue() + EconomyService.format(amount).green())
         sender.playSound(Sound.sound(
             net.kyori.adventure.key.Key.key("entity.experience_orb.pickup"),

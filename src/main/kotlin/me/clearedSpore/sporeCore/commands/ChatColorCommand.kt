@@ -3,6 +3,7 @@ package me.clearedSpore.sporeCore.commands
 import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeCore.extension.PlayerExtension.userJoinFail
@@ -14,24 +15,30 @@ import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
-@CommandAlias("cc|chatcolor")
-@CommandPermission(Perm.CHATCOLOR)
 class ChatColorCommand : SporeCommand() {
 
-    @Default()
+    @Command("cc")
+    @Command("chatcolor")
+    @Permission(Perm.CHATCOLOR)
     fun onChatColor(player: Player) {
         ChatColorMenu(player).open(player)
     }
 
 
-    @Subcommand("set")
-    @CommandCompletion("@players @colors")
-    @CommandPermission(Perm.ADMIN)
-    @Syntax("<player> <color>")
-    fun onSetColor(sender: CommandSender, targetName: String, colorStr: String) {
+    @Command("cc set <player> <color>")
+    @Command("chatcolor set <player> <color>")
+    @Permission(Perm.ADMIN)
+    fun onSetColor(
+        sender: CommandSender,
+        @Argument("player", suggestions = "players") targetName: String,
+        @Argument("color") color: String
+    ) {
         val target = Bukkit.getOfflinePlayer(targetName)
-        val targetSuffix = if (Bukkit.getOnlinePlayers().contains(target)) chatService?.getPlayerSuffix(target.player)?.translate() ?: "" else ""
+        val targetSuffix = if (Bukkit.getOnlinePlayers().contains(target)) chatService?.getPlayerSuffix(target.player)?.legacyToMiniMessage() ?: "" else ""
 
         val user = UserManager.get(target)
 
@@ -40,7 +47,7 @@ class ChatColorCommand : SporeCommand() {
             return
         }
 
-        val color = ChatColorService.getColorByKey(colorStr)
+        val color = ChatColorService.getColorByKey(color)
 
         if (color == null) {
             sender.sendMessage("That color does not exist!".red())
@@ -48,7 +55,7 @@ class ChatColorCommand : SporeCommand() {
         }
 
         ChatColorService.setColor(user, color)
-        sender.sendMessage("You have set $targetSuffix$targetName".blue() + "'s chatcolor to $colorStr".blue())
+        sender.sendMessage("You have set $targetSuffix$targetName".blue() + "'s chatcolor to $color".blue())
 
     }
 }

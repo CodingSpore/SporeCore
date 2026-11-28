@@ -4,6 +4,7 @@ import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.green
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Cooldown
@@ -98,8 +99,8 @@ class PayCommand : SporeCommand() {
         }
 
         PaymentCooldownService.onPayment(sender.uniqueId)
-        val senderSuffix = chatService?.getPlayerSuffix(sender.player)?.translate() ?: ""
-        val targetSuffix = if (Bukkit.getOnlinePlayers().contains(targetUser.player)) chatService?.getPlayerSuffix(targetUser.player)?.translate() ?: "" else ""
+        val senderSuffix = chatService?.getPlayerSuffix(sender.player)?.legacyToMiniMessage() ?: ""
+        val targetSuffix = if (Bukkit.getOnlinePlayers().contains(targetUser.player)) chatService?.getPlayerSuffix(targetUser.player)?.legacyToMiniMessage() ?: "" else ""
         EconomyService.remove(senderUser, amount, "Paid to ${targetUser.playerName}")
         EconomyService.add(targetUser, amount, "Received from ${sender.name}", false)
 

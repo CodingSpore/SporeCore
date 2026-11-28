@@ -7,6 +7,7 @@ import io.leangen.geantyref.TypeToken
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import me.clearedSpore.sporeAPI.SporePlugin
 import me.clearedSpore.sporeAPI.command.SporeCommand
+import me.clearedSpore.sporeAPI.command.SporeCommandManager
 import me.clearedSpore.sporeAPI.command.cloud.SporeCloudCommandManager
 import me.clearedSpore.sporeAPI.task.Tasks
 import me.clearedSpore.sporeAPI.util.*
@@ -108,8 +109,7 @@ class SporeCore : SporePlugin() {
         lateinit var version: Version
     }
 
-    lateinit var commandManager: PaperCommandManager
-    lateinit var commandManager2: SporeCloudCommandManager
+    lateinit var commandManager: SporeCommandManager
 
     lateinit var coreConfig: CoreConfig
     lateinit var database: Database
@@ -137,7 +137,7 @@ class SporeCore : SporePlugin() {
         totalCommands = 0
         instance = this
 
-        version = Version.PUBLIC
+        version = Version.DEV
 
         coreConfig = loadConfig()
         Logger.initialize(
@@ -156,8 +156,8 @@ class SporeCore : SporePlugin() {
 
         Logger.info("Loading SporeCore")
         Message.init(true)
-        commandManager = PaperCommandManager(this)
-        setupCloud()
+        commandManager = SporeCommandManager(this)
+        setupCloud(SporeCloudCommandManager(this))
         setupACF()
         Tasks.onInitialize(this)
         Perm.registerAll()
@@ -172,6 +172,7 @@ class SporeCore : SporePlugin() {
         DatabaseManager.init(dataFolder)
         database = DatabaseManager.getServerData()
         server.pluginManager.registerEvents(UserListener(), this)
+        UserManager.pruneAllPlaytimeHistory(DatabaseManager.getUserCollection())
 
         InventoryManager.startCleanupTask()
 
@@ -399,7 +400,7 @@ class SporeCore : SporePlugin() {
 
     fun logStartupBanner() {
         val pluginName = "SporeCore"
-        val author = "ClearedSpore, kittyisdev"
+        val author = "ClearedSpore, DumbAtSkyblock"
         val serverType = Bukkit.getServer().name + " - " + Bukkit.getServer().version
 
         val features = mutableListOf<String>()
@@ -441,7 +442,9 @@ class SporeCore : SporePlugin() {
             Bukkit.getConsoleSender().sendMessage("§9[SporeCore] §eYou are using a Developer version")
             Bukkit.getConsoleSender().sendMessage("§9[SporeCore] §eof the plugin. This version may")
             Bukkit.getConsoleSender().sendMessage("§9[SporeCore] §econtain bugs. Please report them")
-            Bukkit.getConsoleSender().sendMessage("§9[SporeCore] §eto §fClearedSpore")
+            Bukkit.getConsoleSender().sendMessage("§9[SporeCore] §eto §fthe support discord server")
+            Bukkit.getConsoleSender().sendMessage("§9[SporeCore] §f")
+            Bukkit.getConsoleSender().sendMessage("§9[SporeCore] §bhttps://discord.gg/SuQ9Fgd9jd")
             Bukkit.getConsoleSender().sendMessage("")
         }
     }

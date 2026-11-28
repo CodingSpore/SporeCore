@@ -5,6 +5,8 @@ import me.clearedSpore.sporeAPI.annotation.RegisterListener
 import me.clearedSpore.sporeAPI.exception.LoggedException
 import me.clearedSpore.sporeAPI.task.Tasks
 import me.clearedSpore.sporeAPI.util.ActionBar.actionBar
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
+import me.clearedSpore.sporeAPI.util.CC.mm
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.ChatInputService
@@ -162,10 +164,10 @@ class ChatListener : Listener {
             message = PlaceholderAPI.setPlaceholders(player, message)
         }
 
-        if (player.hasPermission(Perm.COLORED_CHAT) && config.features.coloredChat) {
-            message = message.translate()
+        message = if (player.hasPermission(Perm.COLORED_CHAT) && config.features.coloredChat) {
+            message.translate()
         } else {
-            message = message
+            message
                 .replace(Regex("&[0-9a-fk-orA-FK-OR]"), "")
                 .replace(Regex("<#[a-fA-F0-9]{6}>"), "")
                 .replace(Regex("<[a-zA-Z_:]+>"), "")
@@ -194,8 +196,8 @@ class ChatListener : Listener {
             }
         }
 
-        val prefix = chatService?.getPlayerPrefix(player)?.translate() ?: ""
-        var suffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
+        val prefix = chatService?.getPlayerPrefix(player) ?: ""
+        var suffix = chatService?.getPlayerSuffix(player) ?: ""
         val chatFormatConfig = config.chat.formatting
 
         if (VanishService.isVanished(senderUser.uuid) && chatFormatConfig.hideVanishSuffix) {
@@ -213,10 +215,10 @@ class ChatListener : Listener {
                 format = PlaceholderAPI.setPlaceholders(player, format)
             }
 
-            format.translate()
+            format
         } else {
-            "$prefix${player.name}$suffix: $message".translate()
-        }
+            "$prefix${player.name}$suffix&f: $message"
+        } ; Logger.info("Formatted message is $formattedMessage")
 
         mentionedPlayers.forEach { target ->
             val targetUser = UserManager.get(target) ?: return@forEach
@@ -268,15 +270,12 @@ class ChatListener : Listener {
         }
 
         if(chatFormatConfig.enabled) {
-            event.recipients.forEach { it.sendMessage(formattedMessage) }
+            event.recipients.forEach { it.sendMessage(formattedMessage.legacyToMiniMessage().translate()) }
             event.isCancelled = true
-            Bukkit.getConsoleSender().sendMessage(formattedMessage)
+            Bukkit.getConsoleSender().sendMessage(formattedMessage.legacyToMiniMessage().translate())
         }
 
         event.message = formattedMessage
-            .replace(Regex("&[0-9a-fk-orA-FK-OR]"), "")
-            .replace(Regex("<#[a-fA-F0-9]{6}>"), "")
-            .replace(Regex("<[a-zA-Z_:]+>"), "")
 
         if(config.discord.chat.isNotEmpty()){
             val dcMessage = org.bukkit.ChatColor.stripColor(message)!!

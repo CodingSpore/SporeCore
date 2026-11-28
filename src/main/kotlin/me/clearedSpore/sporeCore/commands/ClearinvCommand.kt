@@ -10,30 +10,46 @@ import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeCore.acf.targets.`object`.TargetPlayers
 import me.clearedSpore.sporeAPI.annotation.RegisterCommand
 import me.clearedSpore.sporeAPI.command.SporeCommand
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
+import me.clearedSpore.sporeAPI.util.Logger
+import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
+import me.clearedSpore.sporeAPI.util.Message.sendSuccessMessage
+import me.clearedSpore.sporeAPI.util.log
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.bukkit.data.MultiplePlayerSelector
 
-@CommandAlias("clearinv|clearinventory|ci|clear")
 @RegisterCommand
 class ClearinvCommand : SporeCommand() {
 
-    @Default
-    @CommandCompletion("@targets")
-    fun onClear(sender: CommandSender, @Optional targets: TargetPlayers?) {
+    @Command("clearinv [players]")
+    @Command("clearinventory [players]")
+    @Command("clear [players]")
+    @Command("ci [players]")
+    fun onClear(sender: CommandSender, @Argument("players", suggestions = "players") targets: MultiplePlayerSelector?) {
 
-        val resolved = targets ?: when (sender) {
-            is Player -> listOf(sender)
-            else -> throw InvalidCommandArgument("You must specify a player.")
+        if (targets == null) {
+            check(sender is Player) { Logger.error("You must specify a target.") }
+            sender.sendSuccessMessage("Your inventory has been cleared.")
+            sender.inventory.clear()
+            return
         }
+        var suffix = chatService?.getPlayerSuffix(sender as Player)?.legacyToMiniMessage() ?: ""
 
-        val players = resolved.filter {
-            sender == it || sender.hasPermission(Perm.CLEAR_OTHERS)
+        val players = targets.values()
+
+        if (!sender.hasPermission(Perm.CLEAR_OTHERS)) {
+            sender.sendErrorMessage("You don't have permission to clear other players")
+            return
         }
 
         if (players.isEmpty()) {
-            throw InvalidCommandArgument("No valid players to clear.")
+            sender.sendErrorMessage("No players matched that selector.")
+            return
         }
 
         players.forEach {
@@ -41,14 +57,15 @@ class ClearinvCommand : SporeCommand() {
             it.sendMessage("Your inventory has been cleared.".blue())
         }
 
-        val targetSuffix = chatService?.getPlayerSuffix(players.first().player)?.translate() ?: ""
+        val targetSuffix = chatService?.getPlayerSuffix(players.first().player)?.legacyToMiniMessage() ?: ""
 
-        sender.sendMessage(
-            if (players.size == 1)
-                "You cleared $targetSuffix${players.first().name}".blue() + "'s inventory.".blue()
-            else
-                "You cleared ${players.size} players' inventories.".blue()
-        )
+        if (players.size == 1) {
+            Logger.log(suffix, sender, Perm.LOG, "cleared $targetSuffix$name's inventory", false)
+            sender.sendSuccessMessage("You cleared $targetSuffix${players.first().name}".blue() + "'s inventory.".blue())
+        } else {
+            Logger.log(suffix, sender, Perm.LOG, "cleared the inventories of all players online", false)
+            sender.sendSuccessMessage("You cleared ${players.size} players' inventories.".blue())
+        }
     }
 }
 

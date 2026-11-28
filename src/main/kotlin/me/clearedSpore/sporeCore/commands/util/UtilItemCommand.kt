@@ -19,14 +19,15 @@ import me.clearedSpore.sporeCore.util.button.TextButton
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
-@CommandAlias("util")
-@CommandPermission(Perm.UTIL_COMMAND)
 @RegisterCommand
 class UtilItemCommand : SporeCommand() {
 
-    @Subcommand("item toBase64")
-    @CommandPermission(Perm.UTIL_ITEM)
+    @Command("util item toBase64")
+    @Permission(Perm.UTIL_ITEM)
     fun onToBase64(player: Player) {
         val item = player.itemInHand
 
@@ -51,9 +52,9 @@ class UtilItemCommand : SporeCommand() {
         player.sendMessage(button)
     }
 
-    @Subcommand("item fromBase64")
-    @CommandPermission(Perm.UTIL_ITEM)
-    fun fromBase64(player: Player, @Name("string") base64: String) {
+    @Command("util item fromBase64 <string>")
+    @Permission(Perm.UTIL_ITEM)
+    fun fromBase64(player: Player, @Argument("string") base64: String) {
         try {
             val item = ItemUtil.itemStackFromBase64(base64)
 
@@ -70,8 +71,8 @@ class UtilItemCommand : SporeCommand() {
     }
 
 
-    @Subcommand("item toNBT")
-    @CommandPermission(Perm.UTIL_ITEM)
+    @Command("util item toNBT")
+    @Permission(Perm.UTIL_ITEM)
     fun onNBT(player: Player) {
         val item = player.itemInHand
         if (item.type == Material.AIR) {
@@ -89,8 +90,8 @@ class UtilItemCommand : SporeCommand() {
         player.sendMessage(button)
     }
 
-    @Subcommand("item hash")
-    @CommandPermission(Perm.UTIL_ITEM)
+    @Command("util item hash")
+    @Permission(Perm.UTIL_ITEM)
     fun onHash(player: Player) {
         val item = player.itemInHand
 
@@ -108,9 +109,9 @@ class UtilItemCommand : SporeCommand() {
         player.sendMessage(button)
     }
 
-    @Subcommand("item addNBT")
+    @Command("util item addNBT <key> <value>")
     @CommandPermission(Perm.UTIL_ITEM)
-    fun onNBTAdd(player: Player, @Name("key") key: String, @Name("value") value: String) {
+    fun onNBTAdd(player: Player, @Argument("key") key: String, @Argument("value") value: String) {
         val item = player.itemInHand
 
         if (item.type == Material.AIR) {
@@ -127,9 +128,9 @@ class UtilItemCommand : SporeCommand() {
         }
     }
 
-    @Subcommand("item hasNBT")
-    @CommandPermission(Perm.UTIL_ITEM)
-    fun onHasNBT(player: Player, @Name("key") key: String) {
+    @Command("util item hasNBT <key>")
+    @Permission(Perm.UTIL_ITEM)
+    fun onHasNBT(player: Player, @Argument("key") key: String) {
         val item = player.itemInHand
 
         if (item.type == Material.AIR) {
@@ -146,9 +147,9 @@ class UtilItemCommand : SporeCommand() {
         }
     }
 
-    @Subcommand("item fromNBT")
-    @CommandPermission(Perm.UTIL_ITEM)
-    fun fromNBT(player: Player, @Name("nbt") nbtString: String) {
+    @Command("item fromNBT <nbt>")
+    @Permission(Perm.UTIL_ITEM)
+    fun fromNBT(player: Player, @Argument("nbt") nbtString: String) {
         try {
             val item = ItemUtil.itemStackFromBase64(nbtString)
 
@@ -171,8 +172,8 @@ class UtilItemCommand : SporeCommand() {
     }
 
 
-    @Subcommand("item clearNBT")
-    @CommandPermission(Perm.UTIL_ITEM)
+    @Command("util item clearNBT")
+    @Permission(Perm.UTIL_ITEM)
     fun onClearNBT(player: Player) {
         val item = player.itemInHand
 
@@ -187,8 +188,8 @@ class UtilItemCommand : SporeCommand() {
         player.sendSuccessMessage("Cleared all NBT tags from the item.")
     }
 
-    @Subcommand("item listNBT")
-    @CommandPermission(Perm.UTIL_ITEM)
+    @Command("util item listNBT")
+    @Permission(Perm.UTIL_ITEM)
     fun onListNBT(player: Player) {
         val item = player.itemInHand
         if (item.type == Material.AIR) {
@@ -203,8 +204,8 @@ class UtilItemCommand : SporeCommand() {
         }
     }
 
-    @Subcommand("item toJson")
-    @CommandPermission(Perm.UTIL_ITEM)
+    @Command("util item toJson")
+    @Permission(Perm.UTIL_ITEM)
     fun onToJson(player: Player) {
         val item = player.itemInHand
 

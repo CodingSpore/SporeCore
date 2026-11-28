@@ -8,6 +8,9 @@ import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeCore.acf.targets.`object`.TargetPlayers
 import me.clearedSpore.sporeAPI.annotation.RegisterCommand
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
+import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
+import me.clearedSpore.sporeAPI.util.Message.sendSuccessMessage
 import me.clearedSpore.sporeAPI.util.log
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
 import me.clearedSpore.sporeCore.util.Perm
@@ -15,43 +18,52 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Damageable
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
+import org.incendo.cloud.bukkit.data.MultiplePlayerSelector
 
-@CommandAlias("heal")
-@CommandPermission(Perm.HEAL)
 @RegisterCommand
 class HealCommand : SporeCommand() {
 
-    @Default
-    @CommandCompletion("@targets")
-    fun onHeal(sender: CommandSender, @Optional targets: TargetPlayers?) {
-        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.translate() ?: "" else "&4"
 
-        val resolved = targets ?: when (sender) {
-            is Entity -> listOf(sender)
-            else -> throw InvalidCommandArgument("You must specify a target.")
+    @Command("heal [targets]")
+    @Permission(Perm.HEAL)
+    fun onHeal(
+        sender: CommandSender,
+        @Argument("targets", suggestions = "players") targets: MultiplePlayerSelector?
+    ) {
+        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.legacyToMiniMessage() ?: "" else ""
+
+        if (targets == null) {
+            check(sender is Player) { Logger.error("You must specify a target.") }
+            sender.sendSuccessMessage("You have been fed!")
+            sender.foodLevel = 20 ; sender.saturation = 20f
+            return
         }
 
-        val healables = resolved.filterIsInstance<Damageable>().filter {
-            it !is Player || sender == it || sender.hasPermission(Perm.HEAL_OTHERS)
+        if (!sender.hasPermission(Perm.HEAL_OTHERS)) {
+            sender.sendErrorMessage("You don't have permission to heal other players")
+            return
         }
 
-        if (healables.isEmpty()) {
-            throw InvalidCommandArgument("No valid entities to heal.")
+        val players = targets.values()
+
+        if (players.isEmpty()) {
+            sender.sendErrorMessage("No players matched that selector.")
+            return
         }
 
-        healables.forEach {
+        players.forEach {
             it.health = it.maxHealth
-            if (it is Player) {
-                it.foodLevel = 20
-                it.saturation = 20f
-            }
+            it.foodLevel = 20 ; it.saturation = 20f
         }
 
-        val count = healables.size
+        val count = players.size
 
         if (count == 1) {
-            val name = (healables.first() as? Player)?.name ?: healables.first().type.name.lowercase()
-            val targetSuffix = chatService?.getPlayerSuffix(healables.first() as? Player)?.translate()
+            val name = players.first()?.name ?: players.first().type.name.lowercase()
+            val targetSuffix = chatService?.getPlayerSuffix(players.first())?.translate()
             sender.sendMessage("You healed $targetSuffix$name&r&#1D91FF.".blue())
             Logger.log(suffix, sender, Perm.LOG, "healed $targetSuffix$name", false)
         } else {

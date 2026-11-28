@@ -10,32 +10,25 @@ import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
 @CommandAlias("tpcoords|tpc|tppos")
 @CommandPermission(Perm.TELEPORT_CORDS)
 @RegisterCommand
 class TpCoordsCommand : SporeCommand() {
 
-    @Default
-    @CommandCompletion("@players|~ ~ ~ ~")
+    @Command("tpcoords <x> <y> <z>")
+    @Command("tpc <x> <y> <z>")
+    @Command("tppos <x> <y> <z>")
+    @Permission(Perm.TELEPORT_CORDS)
     fun onTpCoords(
         executor: Player,
-        arg1: String,
-        arg2: String,
-        arg3: String,
-        @Optional targetName: String?
+        @Argument("x") arg1: String,
+        @Argument("y") arg2: String,
+        @Argument("z") arg3: String
     ) {
-        val target: Player? = if (targetName != null) {
-            Bukkit.getPlayer(targetName)
-        } else {
-            executor
-        }
-
-        if (target == null) {
-            executor.sendErrorMessage("That player is not online!")
-            return
-        }
-
 
         val base = executor.location
 
@@ -49,8 +42,8 @@ class TpCoordsCommand : SporeCommand() {
         }
 
 
-        target.teleportAsync(Location(target.world, x, y, z))
-        executor.sendSuccessMessage("Teleported ${target.name} to &f$x $y $z".blue())
+        executor.teleportAsync(Location(executor.world, x, y, z))
+        executor.sendSuccessMessage("Teleported ${executor.name} to &f$x $y $z".blue())
     }
 
     private fun parseCoordinate(base: Double, input: String): Double? {

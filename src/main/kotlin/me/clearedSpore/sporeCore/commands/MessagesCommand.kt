@@ -19,13 +19,17 @@ import me.clearedSpore.sporeCore.user.UserManager
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 import java.util.*
 
-@CommandAlias("messages|mail|checkmessages")
 @RegisterCommand
 class MessagesCommand : SporeCommand() {
 
-    @Default()
+    @Command("messages")
+    @Command("mail")
+    @Command("checkmessages")
     fun onMessages(player: Player) {
         val user = UserManager.get(player)
 
@@ -43,10 +47,14 @@ class MessagesCommand : SporeCommand() {
 
     }
 
-    @Subcommand("admin send")
-    @CommandPermission(Perm.MESSAGE_ADMIN)
-    @CommandCompletion("@players")
-    fun onAdd(player: CommandSender, targetName: String, type: MessageType, text: String) {
+    @Command("messages admin send <player> <text>")
+    @Command("mail admin send <player> <text>")
+    @Permission(Perm.MESSAGE_ADMIN)
+    fun onAdd(
+        player: CommandSender,
+        @Argument("player", suggestions = "players") targetName: String,
+        @Argument("text") text: String
+    ) {
         val user = UserManager.get(targetName)
 
         if (user == null) {
@@ -57,20 +65,20 @@ class MessagesCommand : SporeCommand() {
         val message = Message(
             UUID.randomUUID().toString(),
             System.currentTimeMillis(),
-            type,
+            MessageType.MESSAGE,
             text,
             player.uuid(),
             true
         )
 
         user.queueMessage(message)
-        player.sendSuccessMessage("Successfully send the message to &f${user.playerName}")
+        player.sendSuccessMessage("Successfully sent the message to &f${user.playerName}")
     }
 
-    @Subcommand("admin view")
-    @CommandPermission(Perm.MESSAGE_ADMIN)
-    @CommandCompletion("@players")
-    fun onView(player: Player, targetName: String) {
+    @Command("messages admin view <player>")
+    @Command("mail admin view <player>")
+    @Permission(Perm.MESSAGE_ADMIN)
+    fun onView(player: Player, @Argument("player", suggestions = "players") targetName: String) {
         val user = UserManager.get(targetName)
 
         if (user == null) {

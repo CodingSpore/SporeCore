@@ -18,24 +18,29 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Default
+import org.incendo.cloud.annotations.Flag
+import org.incendo.cloud.annotations.Permission
 import java.util.*
+import javax.annotation.Nullable
 
-@CommandAlias("getlogs")
-@CommandPermission(Perm.VIEW_LOGS)
 @RegisterCommand
 class GetLogsCommand : SporeCommand() {
 
     private val pageSize = 6
 
-    @Default
-    @CommandCompletion("@players @logtypes @range:1-20 time=|contains=")
-    @Syntax("<player> <type> [page] [time=<time>] [contains=<text>]")
+    @Command("getlogs <target> <logTypes> [page] [time] [contains]")
+    @Permission(Perm.VIEW_LOGS)
     fun onLogs(
         sender: CommandSender,
-        targetName: String,
-        typeArg: String,
-        @Optional pageArg: Int?,
-        vararg extraArgs: String
+        @Argument("target", suggestions = "players") targetName: String,
+        @Argument("logTypes", suggestions = "logTypes") typeArg: String,
+        @Argument("page") pageArg: Int?,
+        @Argument("time", suggestions = "time") @Default("30d") time: String?,
+        @Argument("contains") contains: String?,
+
     ) {
         val targetPlayer = Bukkit.getOfflinePlayer(targetName)
         if (!targetPlayer.hasPlayedBefore()) {
@@ -43,10 +48,7 @@ class GetLogsCommand : SporeCommand() {
             return
         }
 
-        val targetUUID = targetPlayer.uniqueId ?: run {
-            sender.sendMessage("Could not retrieve player UUID.".red())
-            return
-        }
+        val targetUUID = targetPlayer.uniqueId
 
         val type = try {
             LogType.valueOf(typeArg.uppercase())
@@ -56,27 +58,39 @@ class GetLogsCommand : SporeCommand() {
         }
 
         var page = pageArg ?: 1
-        var timeFilter: Long? = null
+        var timeFilter: Long?
         var containsFilter: String? = null
 
-        extraArgs.forEach { arg ->
-            when {
-                arg.startsWith("time=", true) -> {
-                    val durationStr = arg.substringAfter("=")
-                    val durationMs = TimeUtil.parse(durationStr).millis
-                    timeFilter = System.currentTimeMillis() - durationMs
-                }
-
-                arg.startsWith("contains=", true) -> containsFilter = arg.substringAfter("=")
-            }
+        if (time == null) {
+            val durationMs = TimeUtil.parse("30d").millis
+            timeFilter = System.currentTimeMillis() - durationMs
+        } else {
+            val durationMs = TimeUtil.parse(time).millis
+            timeFilter = System.currentTimeMillis() - durationMs
         }
+
+        if (contains != null) {
+            containsFilter = contains
+        }
+
+//        extraArgs.forEach { arg ->
+//            when {
+//                arg.startsWith("time=", true) -> {
+//                    val durationStr = arg.substringAfter("=")
+//                    val durationMs = TimeUtil.parse(durationStr).millis
+//                    timeFilter = System.currentTimeMillis() - durationMs
+//                }
+//
+//                arg.startsWith("contains=", true) -> containsFilter = arg.substringAfter("=")
+//            }
+//        }
 
         sender.sendMessage("Fetching logs async...".blue())
 
         Tasks.runAsync {
             var logs = LogsService.findLogs(type, targetUUID.toString())
 
-            timeFilter?.let { fromTime -> logs = logs.filter { it.timestamp >= fromTime } }
+            timeFilter.let { fromTime -> logs = logs.filter { it.timestamp >= fromTime } }
             containsFilter?.let { contains -> logs = logs.filter { it.action.contains(contains, ignoreCase = true) } }
 
             logs = logs.sortedByDescending { it.timestamp }
@@ -127,10 +141,10 @@ class GetLogsCommand : SporeCommand() {
             val isLastPage = endIndex >= logs.size
             val nextPage = page + 1
             val baseCmd = mutableListOf("/getlogs", targetName, type.name, nextPage.toString())
-            extraArgs.forEach { arg ->
-                if (!arg.startsWith("time=", true) && !arg.startsWith("contains=", true)) return@forEach
-                baseCmd.add(arg)
-            }
+//            extraArgs.forEach { arg ->
+//                if (!arg.startsWith("time=", true) && !arg.startsWith("contains=", true)) return@forEach
+//                baseCmd.add(arg)
+//            }
             val nextPageCmd = baseCmd.joinToString(" ")
 
             val nextPageText = if (isLastPage) {

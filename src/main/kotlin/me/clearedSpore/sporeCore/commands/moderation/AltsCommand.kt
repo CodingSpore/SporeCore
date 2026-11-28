@@ -11,23 +11,21 @@ import me.clearedSpore.sporeCore.user.UserManager
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
-@CommandAlias("alts")
-@CommandPermission(Perm.ALTS)
 class AltsCommand : SporeCommand() {
 
-    @Default
-    @Syntax("<player>")
-    @CommandCompletion("@players")
-    fun onAlts(sender: CommandSender, targetName: String) {
+    @Command("alts <player>")
+    @Permission(Perm.ALTS)
+    fun onAlts(sender: CommandSender, @Argument("player", suggestions = "players") targetName: String) {
         handleAlts(sender, targetName, useDeep = false)
     }
 
-    @Subcommand("deep")
-    @Syntax("<player>")
-    @CommandPermission(Perm.ALTS_DEEP)
-    @CommandCompletion("@players")
-    fun onAltsDeep(sender: CommandSender, targetName: String) {
+    @Command("alts deep <player>")
+    @Permission(Perm.ALTS_DEEP)
+    fun onAltsDeep(sender: CommandSender, @Argument("player", suggestions = "players") targetName: String) {
         handleAlts(sender, targetName, useDeep = true)
     }
 

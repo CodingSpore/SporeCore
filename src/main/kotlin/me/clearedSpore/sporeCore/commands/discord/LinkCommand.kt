@@ -13,12 +13,13 @@ import me.clearedSpore.sporeCore.features.discord.DiscordService
 import me.clearedSpore.sporeCore.user.UserManager
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
-@CommandAlias("link")
-@CommandPermission(Perm.LINK)
 class LinkCommand : SporeCommand() {
 
-    @Default()
+    @Command("link")
+    @Permission(Perm.LINK)
     fun onLink(player: Player) {
         val user = UserManager.get(player)
         if (user == null) {

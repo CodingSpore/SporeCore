@@ -4,6 +4,7 @@ import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import co.aikar.commands.bukkit.contexts.OnlinePlayer
 import me.clearedSpore.sporeAPI.util.CC.blue
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Logger
@@ -15,22 +16,24 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
 
 @CommandAlias("vanish|v")
 @CommandPermission(Perm.VANISH)
 class VanishCommand : SporeCommand() {
 
-    @Default
-    @CommandCompletion("@players")
-    fun onVanish(sender: CommandSender, @Optional @Name("target") target: OnlinePlayer?) {
-        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.translate() ?: "" else ""
-        var targetSuffix = if (target != null) chatService?.getPlayerSuffix(target.player)?.translate() ?: "" else " "
+    @Command("vanish [player]")
+    @Command("v [player]")
+    fun onVanish(sender: CommandSender, @Argument("player", suggestions = "players") target: Player?) {
+        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.legacyToMiniMessage() ?: "" else ""
+        var targetSuffix = if (target != null) chatService?.getPlayerSuffix(target.player)?.legacyToMiniMessage() ?: "" else ""
         if (sender is ConsoleCommandSender && target == null) {
             sender.sendMessage("Console must support a target!".red())
             return
         }
 
-        if (target == null) {
+        if (target == null || !target.isOnline) {
             val player = Bukkit.getPlayer(sender.name) ?: return
 
             VanishService.toggle(player.uniqueId, true)
@@ -43,14 +46,14 @@ class VanishCommand : SporeCommand() {
                 return
             }
 
-            VanishService.toggle(target.player.uniqueId, sender !is ConsoleCommandSender)
-            val isVanished = VanishService.isVanished(target.player.uniqueId)
-            sender.sendMessage(if (isVanished) "Enabled Vanish for ${targetSuffix}${target.player.name}".blue() else "Disabled Vanish for ${targetSuffix}${target.player.name}".red())
+            VanishService.toggle(target.player!!.uniqueId, sender !is ConsoleCommandSender)
+            val isVanished = VanishService.isVanished(target.uniqueId)
+            sender.sendMessage(if (isVanished) "Enabled Vanish for ${targetSuffix}${target.name}".blue() else "Disabled Vanish for ${targetSuffix}${target.name}".red())
             Logger.log(
                 suffix,
                 sender,
                 Perm.LOG,
-                if (isVanished) "enabled vanish for ${targetSuffix}${target.player.name}" else "disabled vanish for ${targetSuffix}${target.player.name}",
+                if (isVanished) "enabled vanish for ${targetSuffix}${target.name}" else "disabled vanish for ${targetSuffix}${target.name}",
                 false
             )
         }

@@ -3,6 +3,7 @@ package me.clearedSpore.sporeCore.features.investigation
 import me.clearedSpore.sporeAPI.exception.LoggedException
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.green
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Logger
 import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
@@ -40,7 +41,7 @@ object IGService {
     internal val igCollection get() = DatabaseManager.getInvestigationCollection()
 
     fun startInvestigation(creator: Player, name: String, description: String, priority: InvestigationPriority) {
-        var suffix = chatService?.getPlayerSuffix(creator)?.translate() ?: ""
+        var suffix = chatService?.getPlayerSuffix(creator)?.legacyToMiniMessage() ?: ""
 
         val investigation = Investigation(
             UUID.randomUUID().toString(),

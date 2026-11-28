@@ -3,6 +3,7 @@ package me.clearedSpore.sporeCore.commands
 import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Logger
@@ -17,17 +18,18 @@ import me.clearedSpore.sporeCore.util.Perm
 import me.clearedSpore.sporeCore.util.TeleportService.awaitTeleport
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
-@CommandAlias("warp|warps")
 class WarpCommand : SporeCommand() {
 
     @Dependency
     lateinit var warpService: WarpService
 
-    @Default
-    @CommandCompletion("@warps")
-    @Syntax("<warp>")
-    fun warp(player: Player, @Optional name: String?) {
+    @Command("warp [warp]")
+    @Command("warps [warp]")
+    fun warp(player: Player, @Argument("warp", suggestions = "warps") name: String?) {
         val warps = warpService.getAllWarps()
 
         if (name.isNullOrEmpty()) {
@@ -50,33 +52,39 @@ class WarpCommand : SporeCommand() {
         player.awaitTeleport(warp.location)
     }
 
-    @Subcommand("create")
-    @CommandCompletion("@warps")
-    @CommandPermission(Perm.WARP_CREATE)
-    @Syntax("<name>")
-    fun createWarp(player: Player, name: String) {
+    @Command("warp create <name> [permission]")
+    @Command("warps create <name> [permission]")
+    @Permission(Perm.WARP_CREATE)
+    fun createWarp(player: Player, @Argument("name") name: String, @Argument("permission") permission: String?) {
         val location = player.location
-        var suffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
+        var suffix = chatService?.getPlayerSuffix(player)?.legacyToMiniMessage() ?: ""
         val warps = warpService.getAllWarps()
         val warp = warps.find { it.name.equals(name, ignoreCase = true) }
+        val permission = permission
 
         if (warp != null) {
             player.sendErrorMessage("There is already a warp with that name!")
             return
         }
 
-        warpService.createWarp(name, location)
+        if (permission.isNullOrEmpty()) {
+            warpService.createWarp(name, location, null)
+            player.sendSuccessMessage("You have successfully created a new warp called '$name'")
+            Logger.log(suffix, player, Perm.LOG, "created a new warp called '$name'", false)
+            return
+        }
+
+        warpService.createWarp(name, location, permission)
         player.sendSuccessMessage("You have successfully created a new warp called '$name'")
         Logger.log(suffix, player, Perm.LOG, "created a new warp called '$name'", false)
     }
 
 
-    @Subcommand("delete")
-    @CommandCompletion("@warps")
-    @Syntax("<name>")
-    @CommandPermission(Perm.WARP_DELETE)
-    fun deleteWarp(player: Player, name: String) {
-        var suffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
+    @Command("warp delete <warp>")
+    @Command("warps delete <warp>")
+    @Permission(Perm.WARP_DELETE)
+    fun deleteWarp(player: Player, @Argument("warp", suggestions = "warps") name: String) {
+        var suffix = chatService?.getPlayerSuffix(player)?.legacyToMiniMessage() ?: ""
         val warps = warpService.getAllWarps()
 
         val warp = warps.find { it.name.equals(name, ignoreCase = true) }
@@ -93,11 +101,14 @@ class WarpCommand : SporeCommand() {
         Logger.log(suffix, player, Perm.LOG, "deleted a warp called '$name'", false)
     }
 
-    @Subcommand("permission")
-    @CommandPermission(Perm.WARP_PERMISSION)
-    @CommandCompletion("set|get|clear @warps")
-    @Syntax("<set|get|clear> <warp> [permission]")
-    fun permission(player: Player, action: String, name: String, @Optional permission: String?) {
+    @Command("warp setpermission <warp> <permission>")
+    @Command("warps setpermission <warp> <permission>")
+    @Permission(Perm.WARP_PERMISSION)
+    fun permission(
+        player: Player,
+        @Argument("warp", suggestions = "warps") name: String,
+        @Argument("permission") permission: String?
+    ) {
         val warps = warpService.getAllWarps()
         val warp = warps.find { it.name.equals(name, ignoreCase = true) }
 
@@ -106,39 +117,18 @@ class WarpCommand : SporeCommand() {
             return
         }
 
-        when (action.lowercase()) {
-            "set" -> {
-                if (permission.isNullOrBlank()) {
-                    player.sendErrorMessage("You must specify a permission to set.")
-                    return
-                }
-
-                warpService.setPermission(name, permission)
-                player.sendSuccessMessage("Set permission for warp '$name' to '$permission'.")
-            }
-
-            "get" -> {
-                val current = warp.permission
-                if (current != null) {
-                    player.sendSuccessMessage("Warp '$name' requires permission: §f$current")
-                } else {
-                    player.sendSuccessMessage("Warp '$name' has no permission set.")
-                }
-            }
-
-            "clear" -> {
-                warpService.deletePermission(name)
-                player.sendSuccessMessage("Cleared permission for warp '$name'.")
-            }
-
-            else -> {
-                player.sendErrorMessage("Invalid action. Use §fset|get|clear")
-            }
+        if (permission.isNullOrBlank()) {
+            player.sendErrorMessage("You must specify a permission to set.")
+            return
         }
+
+        warpService.setPermission(name, permission)
+        player.sendSuccessMessage("Set permission for warp '$name' to '$permission'.")
     }
 
-    @Subcommand("reload")
-    @CommandPermission(Perm.ADMIN)
+    @Command("warp reload")
+    @Command("warps reload")
+    @Permission(Perm.ADMIN)
     fun reload(sender: CommandSender) {
         try {
             warpService.reloadWarps()

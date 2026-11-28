@@ -3,6 +3,7 @@ package me.clearedSpore.sporeCore.commands
 import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Logger
@@ -18,6 +19,9 @@ import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
 @CommandAlias("kit|kits")
 @CommandPermission(Perm.KITS)
@@ -26,10 +30,10 @@ class KitCommand : SporeCommand() {
     @Dependency
     lateinit var kitService: KitService
 
-    @Default
-    @CommandCompletion("@kits")
-    @Syntax("<kit>")
-    fun kit(player: Player, @Optional name: String?) {
+    @Command("kit [kit]")
+    @Command("kits [kit]")
+    @Permission(Perm.KITS)
+    fun kit(player: Player, @Argument("kit", suggestions = "kits") name: String?) {
         val kits = kitService.getAllKits()
 
         if (name.isNullOrEmpty()) {
@@ -52,14 +56,12 @@ class KitCommand : SporeCommand() {
         kitService.giveKit(player, name)
     }
 
-    @Subcommand("givekit")
-    @CommandCompletion("@kits @targets")
-    @Syntax("<kit> [targets]")
-    @CommandPermission(Perm.KIT_ADMIN)
+    @Command("kit givekit <kit> <player>")
+    @Permission(Perm.KIT_ADMIN)
     fun onGiveKit(
         player: Player,
-        kitName: String,
-        @Optional targets: TargetPlayers?
+        @Argument("kit", suggestions = "kits") kitName: String,
+        @Argument("player", suggestions = "players") target: Player
     ) {
         val kit = kitService.getAllKits()
             .find { it.name.equals(kitName, ignoreCase = true) }
@@ -74,22 +76,14 @@ class KitCommand : SporeCommand() {
             return
         }
 
-        val resolvedTargets = targets ?: listOf(player)
-
-        if (resolvedTargets.isEmpty()) {
-            player.sendErrorMessage("No valid players selected.")
+        if (!target.isOnline) {
+            player.sendErrorMessage("That player is not online!")
             return
         }
 
-        resolvedTargets.forEach { target ->
-            kitService.giveKit(target, kit.name)
-
-            if (target != player) {
-                player.sendSuccessMessage("You gave kit ${kit.name} to ${target.name}!")
-            }
-
-            target.sendSuccessMessage("You received kit ${kit.name}!")
-        }
+        kitService.giveKit(target, kitName)
+        player.sendSuccessMessage("You gave kit ${kit.name} to ${target}!")
+        target.sendSuccessMessage("You received kit ${kit.name}!")
     }
 
 
@@ -98,7 +92,7 @@ class KitCommand : SporeCommand() {
     @CommandPermission(Perm.KIT_ADMIN)
     @Syntax("<name>")
     fun createKit(player: Player, name: String) {
-        var suffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
+        var suffix = chatService?.getPlayerSuffix(player)?.legacyToMiniMessage() ?: ""
         val kits = kitService.getAllKits()
         val kit = kits.find { it.name.equals(name, ignoreCase = true) }
 
@@ -117,7 +111,7 @@ class KitCommand : SporeCommand() {
     @Syntax("<name>")
     @CommandPermission(Perm.KIT_ADMIN)
     fun deleteKit(player: Player, name: String) {
-        var suffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
+        var suffix = chatService?.getPlayerSuffix(player)?.legacyToMiniMessage() ?: ""
         val kit = kitService.getAllKits().find { it.name.equals(name, ignoreCase = true) }
 
         if (kit != null) {
@@ -211,7 +205,7 @@ class KitCommand : SporeCommand() {
     @Syntax("<kit> <time>")
     fun onSetCooldown(player: Player, name: String, time: String) {
         val kit = kitService.getAllKits().find { it.name.equals(name, ignoreCase = true) }
-        var suffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
+        var suffix = chatService?.getPlayerSuffix(player)?.legacyToMiniMessage() ?: ""
 
         if (kit == null) {
             player.sendErrorMessage("No kit found with the name '$name'.")
@@ -232,7 +226,7 @@ class KitCommand : SporeCommand() {
     @CommandCompletion("@kits")
     @Syntax("<kit>")
     fun onSetKitItems(player: Player, name: String) {
-        var suffix = chatService?.getPlayerSuffix(player)?.translate() ?: ""
+        var suffix = chatService?.getPlayerSuffix(player)?.legacyToMiniMessage() ?: ""
         val kit = kitService.getAllKits().find { it.name.equals(name, ignoreCase = true) }
 
         if (kit == null) {

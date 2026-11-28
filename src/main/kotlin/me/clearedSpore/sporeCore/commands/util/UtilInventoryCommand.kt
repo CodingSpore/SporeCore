@@ -14,7 +14,10 @@ import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Message.sendSuccessMessage
 import me.clearedSpore.sporeCore.SporeCore
 import me.clearedSpore.sporeAPI.annotation.RegisterCommand
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
+import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
+import me.clearedSpore.sporeCore.hook.PlaceholderAPIHook
 import me.clearedSpore.sporeCore.inventory.InventoryManager
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Bukkit
@@ -22,26 +25,37 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.ItemStack
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Permission
 
 @CommandAlias("util")
 @CommandPermission(Perm.UTIL_INVENTORY)
 @RegisterCommand
 class UtilInventoryCommand : SporeCommand() {
 
-    @Subcommand("inventory view")
-    @CommandPermission(Perm.UTIL_INVENTORY_VIEW)
-    @CommandCompletion("@players")
-    fun view(sender: Player, @Name("target") targetObject: OnlinePlayer) {
-        val target = targetObject.player
+    @Command("util inventory view <player>")
+    @Permission(Perm.UTIL_INVENTORY_VIEW)
+    fun view(sender: Player, @Argument("player", suggestions = "players") target: Player) {
+        val target = target.player as Player
+        if (!target.isOnline) {
+            sender.sendMessage("${target.name} is not online!".red())
+            return
+        }
+
         InventoryPreviewMenu(target, sender).open(sender)
     }
 
-    @Subcommand("inventory dropall")
-    @CommandPermission(Perm.UTIL_INVENTORY_DROPALL)
-    @CommandCompletion("@players")
-    fun dropAll(sender: Player, @Name("target") targetObject: OnlinePlayer) {
-        val target = targetObject.player
-        var suffix = chatService?.getPlayerSuffix(target)?.translate() ?: ""
+    @Command("util inventory dropall <player>")
+    @Permission(Perm.UTIL_INVENTORY_DROPALL)
+    fun dropAll(sender: Player, @Argument("player", suggestions = "players") target: Player) {
+        val target = target.player as Player
+        if (!target.isOnline) {
+            sender.sendMessage("${target.name} is not online!".red())
+            return
+        }
+
+        var suffix = chatService?.getPlayerSuffix(target)?.legacyToMiniMessage() ?: ""
 
         target.inventory.contents.forEach { item ->
             if (item != null && item.type != Material.AIR) target.world.dropItemNaturally(target.location, item)
@@ -51,8 +65,8 @@ class UtilInventoryCommand : SporeCommand() {
         sender.sendSuccessMessage("Dropped all items from $suffix${target.name}".translate() + "'s inventory.".blue())
     }
 
-    @Subcommand("inventory giveall")
-    @CommandPermission(Perm.UTIL_INVENTORY_GIVEALL)
+    @Command("util inventory giveall")
+    @Permission(Perm.UTIL_INVENTORY_GIVEALL)
     fun giveAll(sender: Player) {
         val items = sender.inventory.contents.filterNotNull()
 
@@ -63,22 +77,25 @@ class UtilInventoryCommand : SporeCommand() {
         sender.sendSuccessMessage("Gave your inventory to all online players.")
     }
 
-    @Subcommand("inventory give")
-    @CommandPermission(Perm.UTIL_INVENTORY_GIVE)
-    @CommandCompletion("@players")
-    fun give(sender: Player, @Name("target") targetObject: OnlinePlayer) {
-        val target = targetObject.player
-        var suffix = chatService?.getPlayerSuffix(target)?.translate() ?: ""
+    @Command("util inventory give <player>")
+    @Permission(Perm.UTIL_INVENTORY_GIVE)
+    fun give(sender: Player, @Argument("player", suggestions = "players") target: Player) {
+        if (!target.isOnline) {
+            sender.sendMessage("${target.name} is not online!".red())
+            return
+        }
+
+        val target = target.player as Player
+        var suffix = chatService?.getPlayerSuffix(target)?.legacyToMiniMessage() ?: ""
         val items = sender.inventory.contents.filterNotNull()
         target.inventory.addItem(*items.toTypedArray())
 
         sender.sendSuccessMessage("Gave your inventory to $suffix${target.name}".translate() + ".".blue())
     }
 
-    @Subcommand("inventory clearall")
-    @CommandCompletion("@materials")
-    @CommandPermission(Perm.UTIL_INVENTORY_CLEARALL)
-    fun clearAll(sender: Player, @Name("material") material: Material) {
+    @Command("util inventory clearall <material>")
+    @Permission(Perm.UTIL_INVENTORY_CLEARALL)
+    fun clearAll(sender: Player, @Argument("material", suggestions = "materials") material: Material) {
         val item = ItemStack(material)
 
         for (player in Bukkit.getOnlinePlayers()) {
@@ -155,7 +172,7 @@ class UtilInventoryCommand : SporeCommand() {
                     override fun onClickEvent(clicker: Player, clickType: ClickType) {
                         target.inventory.clear()
                         target.updateInventory()
-                        var suffix = chatService?.getPlayerSuffix(target)?.translate() ?: ""
+                        var suffix = chatService?.getPlayerSuffix(target)?.legacyToMiniMessage() ?: ""
                         viewer.sendSuccessMessage("$suffix${target.name}".translate() + "'s inventory has been cleared.".blue())
                     }
                 })

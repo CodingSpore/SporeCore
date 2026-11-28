@@ -8,14 +8,13 @@ import me.clearedSpore.sporeCore.menu.stat.StatsMenu
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
 
-@CommandAlias("stat|stats|checkstats")
 class StatsCommand : SporeCommand() {
 
-    @Default
-    @CommandCompletion("@players")
-    @Syntax("[player]")
-    fun onStats(player: Player, @Optional targetName: String?) {
+    @Command("stats [player]")
+    fun onStats(player: Player, @Argument("player", suggestions = "players") targetName: String?) {
         if (targetName == null) {
             StatsMenu(player).open(player)
             return
@@ -25,11 +24,6 @@ class StatsCommand : SporeCommand() {
 
         if (!target.hasPlayedBefore()) {
             player.userJoinFail()
-            return
-        }
-
-        if (player != target && !player.hasPermission(Perm.STATS_OTHERS)) {
-            player.sendMessage("You don't have permission to view other players' stats.".red())
             return
         }
 

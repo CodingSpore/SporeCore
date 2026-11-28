@@ -4,6 +4,7 @@ import me.clearedSpore.sporeAPI.command.SporeCommand
 import co.aikar.commands.annotation.*
 import co.aikar.commands.bukkit.contexts.OnlinePlayer
 import me.clearedSpore.sporeAPI.util.CC.blue
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
 import me.clearedSpore.sporeAPI.util.CC.red
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.util.Logger
@@ -27,7 +28,7 @@ class CustomModeCommand(
 
     @Default
     fun onModeToggle(sender: CommandSender, @Optional @Name("target") target: OnlinePlayer?) {
-        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.translate() ?: "" else ""
+        var suffix = if (sender is Player) chatService?.getPlayerSuffix(sender)?.legacyToMiniMessage() ?: "" else ""
         if (target == null && sender is ConsoleCommandSender) {
             sender.sendMessage("§cConsole must provide a target!")
             return

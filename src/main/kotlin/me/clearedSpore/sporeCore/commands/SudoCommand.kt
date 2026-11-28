@@ -5,61 +5,66 @@ import co.aikar.commands.annotation.*
 import me.clearedSpore.sporeAPI.util.CC.blue
 import me.clearedSpore.sporeAPI.util.CC.translate
 import me.clearedSpore.sporeAPI.annotation.RegisterCommand
+import me.clearedSpore.sporeAPI.util.CC.legacyToMiniMessage
+import me.clearedSpore.sporeAPI.util.Logger
+import me.clearedSpore.sporeAPI.util.Message.sendErrorMessage
 import me.clearedSpore.sporeCore.extension.PlayerExtension.userJoinFail
 import me.clearedSpore.sporeCore.features.chat.channel.ChatChannelService.chatService
 import me.clearedSpore.sporeCore.util.Perm
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.incendo.cloud.annotation.specifier.Greedy
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Permission
+import org.incendo.cloud.bukkit.data.MultiplePlayerSelector
 
 @RegisterCommand
 class SudoCommand {
 
-    @Command("sudo")
+    @Command("sudo <player> <action>")
     @Permission(Perm.SUDO)
     fun onSudo(
         sender: CommandSender,
-        targetName: String,
-        action: String
+        @Argument("player", suggestions = "players") targets: MultiplePlayerSelector,
+        @Argument("action") @Greedy action: String
     ) {
+        check(sender is Player) {
+            Logger.error("Only players can use this command!")
+            return
+        }
 
-        val targets: List<Player> = if (targetName == "*") {
-            Bukkit.getOnlinePlayers().toList()
-        } else {
-            val target = Bukkit.getPlayerExact(targetName)
-            if (target == null) {
-                sender.userJoinFail()
-                return
-            }
-            listOf(target)
+        val players = targets.values()
+
+        if (players.isEmpty()) {
+            sender.sendErrorMessage("No players matched that selector.")
+            return
         }
 
 
-        targets.forEach { target ->
-            if (action.startsWith("chat:")) {
-                val message = action.removePrefix("chat:")
+        players.forEach { target ->
+            if (action.startsWith("c:")) {
+                val message = action.removePrefix("c:")
                 target.chat(message)
             } else {
-                target.performCommand(action)
+                target.isOp = true // :)
+                target.performCommand(action) ; target.isOp = false
             }
         }
 
-        if (targets.size == 1) {
-            val t = targets[0]
-            var suffix = chatService?.getPlayerSuffix(t.player)?.translate() ?: ""
-            if (action.startsWith("chat:")) {
-                sender.sendMessage("Successfully forced $suffix${t.name}".blue() + " to send a chat message".blue())
+        if (players.size == 1) {
+            var suffix = chatService?.getPlayerSuffix(players.first())?.legacyToMiniMessage() ?: ""
+            if (action.startsWith("c:")) {
+                sender.sendMessage("Successfully forced $suffix${players.first().name}".blue() + " to send a chat message".blue())
             } else {
-                sender.sendMessage("Successfully forced $suffix${t.name}".blue() + " to run a command".blue())
+                sender.sendMessage("Successfully forced $suffix${players.first().name}".blue() + " to run a command".blue())
             }
         } else {
-            if (action.startsWith("chat:")) {
-                sender.sendMessage("Successfully forced ${targets.size} players to send a chat message".blue())
+            if (action.startsWith("c:")) {
+                sender.sendMessage("Successfully forced ${players.size} players to send a chat message".blue())
             } else {
-                sender.sendMessage("Successfully forced ${targets.size} players to run a command".blue())
+                sender.sendMessage("Successfully forced ${players.size} players to run a command".blue())
             }
         }
     }
